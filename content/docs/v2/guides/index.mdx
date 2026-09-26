@@ -1,0 +1,33 @@
+---
+title: Guides
+description: Longer walkthroughs that combine several components into something shippable.
+icon: Compass
+---
+
+<include>../../snippets/mock-banner.mdx</include>
+
+The component reference tells you what each piece does. These guides show them working
+together on the problems that actually come up when you publish.
+
+<Cards>
+  <Card
+    title="Newsletter layout"
+    href="/docs/v2/guides/newsletter-layout"
+    description="Measure, rhythm, and a masthead that does not shove the text down the page."
+  />
+  <Card
+    title="Archive page"
+    href="/docs/v2/guides/archive-page"
+    description="Grouping, virtualisation, and keeping the index fast at scale."
+  />
+  <Card
+    title="Migrating to v2"
+    href="/docs/v2/guides/migrating-to-v2"
+    description="Token renames, the Newsletter removal, and the codemod that handles both."
+  />
+</Cards>
+
+<Callout title="This folder is not collapsible">
+  `content/docs/v2/guides/meta.json` sets `"collapsible": false`, so the group stays open in the
+  sidebar. Handy for a short list you always want visible.
+</Callout>

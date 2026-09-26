@@ -1,0 +1,62 @@
+---
+title: Overview
+description: Every component, grouped by what it is for.
+icon: Boxes
+---
+
+<include>../../snippets/mock-banner.mdx</include>
+
+This folder uses `"pagesIndex": "overview"` in its `meta.json`, so clicking **Components** in
+the sidebar lands here instead of on a page called `index`.
+
+## Primitives
+
+The small, unglamorous pieces the rest of the library is built from.
+
+<Cards>
+  <Card title="Button" href="/docs/v2/components/button" description="Solid, outline, ghost, and link variants with a real pending state." />
+  <Card title="Badge" href="/docs/v2/components/badge" description="A label. Nothing more." />
+  <Card title="Card" href="/docs/v2/components/card" description="A bordered container with optional header, body, and footer slots." />
+  <Card title="Input" href="/docs/v2/components/input" description="Text input with a label, description, and error region wired for screen readers." />
+</Cards>
+
+## Composite
+
+Components that manage state or coordinate several elements.
+
+<Cards>
+  <Card title="Tabs" href="/docs/v2/components/tabs" description="Keyboard-navigable tabs with optional URL sync." />
+  <Card title="Dialog" href="/docs/v2/components/dialog" description="Focus-trapped modal built on the native dialog element." />
+</Cards>
+
+## Publishing
+
+Documented in the guides rather than here, because they only make sense in context.
+
+| Component | Where |
+| --- | --- |
+| `Prose`, `Lede`, `Footnote` | [Newsletter layout](/docs/v2/guides/newsletter-layout) |
+| `Archive`, `PostCard` | [Archive page](/docs/v2/guides/archive-page) |
+| `SubscribeForm` | [Quick Start](/docs/v2/quick-start) |
+
+## Conventions shared by every component
+
+<Steps>
+  <Step>
+    ### className is forwarded
+    Always to the outermost element, always last in the class list.
+  </Step>
+  <Step>
+    ### asChild renders into your element
+    Pass `asChild` and a single child, and the component merges its props into that child
+    instead of wrapping it.
+  </Step>
+  <Step>
+    ### Data attributes are public
+    `[data-ls-button]`, `[data-state]`, `[data-variant]`. Class names are not.
+  </Step>
+  <Step>
+    ### Server-first
+    Nothing has `'use client'` unless it genuinely needs an event handler.
+  </Step>
+</Steps>

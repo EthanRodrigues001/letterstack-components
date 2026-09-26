@@ -1,0 +1,21 @@
+{
+  "$schema": "https://fumadocs.dev/schemas/meta.json",
+  "title": "v2.0",
+  "description": "Latest release",
+  "icon": "Layers",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "installation",
+    "quick-start",
+    "theming",
+    "(internal)/roadmap",
+    "components",
+    "guides",
+    "---Resources---",
+    "changelog",
+    "...",
+    "!(internal)"
+  ]
+}

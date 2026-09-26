@@ -1,0 +1,100 @@
+---
+title: Tabs
+description: Keyboard-navigable tabs with optional URL sync.
+icon: PanelsTopLeft
+---
+
+<include>../../snippets/unstyled-note.mdx</include>
+
+```tsx
+import { Tabs } from '@letterstack/react';
+
+<Tabs defaultValue="web">
+  <Tabs.List>
+    <Tabs.Trigger value="web">Web</Tabs.Trigger>
+    <Tabs.Trigger value="email">Email</Tabs.Trigger>
+  </Tabs.List>
+  <Tabs.Panel value="web">Rendered by the app.</Tabs.Panel>
+  <Tabs.Panel value="email">Compiled to tables.</Tabs.Panel>
+</Tabs>
+```
+
+## Props [#tabs-props]
+
+<TypeTable
+  type={{
+    defaultValue: {
+      type: 'string',
+      description: 'Uncontrolled initial tab. Defaults to the first trigger.',
+    },
+    value: {
+      type: 'string',
+      description: 'Controlled active tab. Requires onValueChange.',
+    },
+    onValueChange: {
+      type: '(value: string) => void',
+      parameters: [{ name: 'value', description: 'The newly selected tab value.' }],
+      returns: 'void',
+    },
+    activation: {
+      type: "'automatic' | 'manual'",
+      description: 'Automatic selects on arrow key; manual waits for Enter or Space.',
+      default: "'automatic'",
+    },
+    syncTo: {
+      type: "'hash' | 'query' | false",
+      description: 'Reflect the active tab in the URL so it survives a reload and can be linked.',
+      default: 'false',
+    },
+    groupId: {
+      type: 'string',
+      description: 'Tabs sharing a groupId switch together across the page.',
+    },
+  }}
+/>
+
+## Keyboard behaviour
+
+```txt
+Tab              move focus into the tab list, then to the active panel
+Left / Right     move between triggers
+Home / End       first / last trigger
+Enter / Space    select, when activation is "manual"
+```
+
+<Callout title="Automatic or manual?">
+  Automatic is faster for cheap panels. Use manual when switching triggers a fetch —
+  otherwise arrowing across five tabs fires five requests.
+</Callout>
+
+## Linkable tabs
+
+`syncTo="query"` writes `?tab=email`, which makes a specific tab shareable.
+
+```tsx
+<Tabs defaultValue="web" syncTo="query">
+  {/* ... */}
+</Tabs>
+```
+
+<Callout type="warn" title="One syncing group per page">
+  Two syncing Tabs on the same page fight over the same URL key. Give at most one of them
+  `syncTo`, or scope them with `groupId`.
+</Callout>
+
+## Grouped tabs
+
+Tabs that share a `groupId` switch together — useful when a page shows the same choice
+repeatedly, such as a package manager or a framework.
+
+```tsx
+<Tabs groupId="framework" defaultValue="next">{/* ... */}</Tabs>
+<Tabs groupId="framework" defaultValue="next">{/* ... */}</Tabs>
+```
+
+## Accessibility notes
+
+- `Tabs.List` is `role="tablist"`; triggers are real buttons with `aria-selected`.
+- Only the active panel is in the tab order. Hidden panels use `hidden`, not a class that
+  sets `display: none`, so find-in-page behaves consistently.
+- Panels are labelled by their trigger through `aria-labelledby`.

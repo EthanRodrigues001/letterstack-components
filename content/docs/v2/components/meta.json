@@ -1,0 +1,18 @@
+{
+  "$schema": "https://fumadocs.dev/schemas/meta.json",
+  "title": "Components",
+  "icon": "Boxes",
+  "defaultOpen": true,
+  "pagesIndex": "overview",
+  "pages": [
+    "overview",
+    "button",
+    "badge",
+    "card",
+    "input",
+    "tabs",
+    "dialog",
+    "z...a",
+    "!draft-toast"
+  ]
+}

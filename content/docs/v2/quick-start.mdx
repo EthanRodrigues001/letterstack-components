@@ -1,0 +1,138 @@
+---
+title: Quick Start
+description: Ship a working newsletter page — layout, subscribe form, and archive — in about five minutes.
+icon: Rocket
+---
+
+<include>../snippets/mock-banner.mdx</include>
+
+By the end of this page you will have an issue page that reads well on a phone, a subscribe
+form that validates before it posts, and an archive index that stays fast as the archive
+grows.
+
+## Scaffold the route [step]
+
+```npm
+npx letterstack add prose subscribe-form archive
+```
+
+<Files>
+  <Folder name="app" defaultOpen>
+    <Folder name="issues" defaultOpen>
+      <File name="page.tsx" />
+      <Folder name="[slug]">
+        <File name="page.tsx" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+## Lay out an issue [step]
+
+`Prose` sets the measure, vertical rhythm, and heading scale. `Byline` and `Estimate` read
+from the same post object so they cannot drift apart.
+
+```tsx title="app/issues/[slug]/page.tsx" lineNumbers
+import { Byline, Estimate, Prose, ReadingProgress } from '@letterstack/react';
+import { getIssue } from '@/lib/issues';
+
+export default async function IssuePage({ params }: { params: Promise<{ slug: string }> }) {
+  const issue = await getIssue((await params).slug);
+
+  return (
+    <>
+      <ReadingProgress /> {/* [!code highlight] */}
+      <Prose measure="comfortable">
+        <h1>{issue.title}</h1>
+        <Byline author={issue.author} publishedAt={issue.publishedAt} />
+        <Estimate words={issue.wordCount} />
+        {issue.body}
+      </Prose>
+    </>
+  );
+}
+```
+
+<Callout title="Why measure and not max-width?">
+  `measure` is expressed in characters per line, not pixels, so it holds up when the reader
+  bumps the base font size. `comfortable` is 66ch; `tight` is 52ch; `wide` is 80ch.
+</Callout>
+
+## Add the subscribe form [step]
+
+The form is uncontrolled and posts to whatever `action` you give it. Validation, the
+pending state, and the error region are handled for you.
+
+```tsx title="app/issues/page.tsx"
+import { SubscribeForm } from '@letterstack/react';
+
+<SubscribeForm action="/api/subscribe" placeholder="you@example.com">
+  <SubscribeForm.Label>Get every issue in your inbox</SubscribeForm.Label>
+  <SubscribeForm.Input />
+  <SubscribeForm.Submit>Subscribe</SubscribeForm.Submit>
+  <SubscribeForm.Error />
+</SubscribeForm>
+```
+
+<Tabs items={['Route handler', 'Server action']} groupId="submit-style" persist>
+  <Tab value="Route handler">
+```ts title="app/api/subscribe/route.ts"
+export async function POST(request: Request) {
+  const form = await request.formData();
+  const email = String(form.get('email'));
+
+  await addSubscriber(email);
+  return Response.json({ ok: true });
+}
+```
+  </Tab>
+  <Tab value="Server action">
+```ts title="app/actions.ts"
+'use server';
+
+export async function subscribe(formData: FormData) {
+  const email = String(formData.get('email'));
+
+  await addSubscriber(email);
+}
+```
+  </Tab>
+</Tabs>
+
+## List the archive [step]
+
+`Archive` virtualises its list, so the markup cost is the same at fifty issues and at five
+thousand.
+
+```tsx title="app/issues/page.tsx"
+import { Archive, PostCard } from '@letterstack/react';
+
+<Archive items={issues} groupBy="year">
+  {(issue) => (
+    <PostCard
+      key={issue.slug}
+      href={`/issues/${issue.slug}`}
+      title={issue.title}
+      excerpt={issue.excerpt}
+      date={issue.publishedAt}
+    />
+  )}
+</Archive>
+```
+
+## What you have now [!toc]
+
+| Piece | Component | Client JS |
+| --- | --- | --- |
+| Issue layout | `Prose`, `Byline`, `Estimate` | none |
+| Reading progress | `ReadingProgress` | ~1.1 kB |
+| Subscribe form | `SubscribeForm` | ~2.4 kB |
+| Archive index | `Archive`, `PostCard` | ~3.0 kB |
+
+## Where to go next
+
+<Cards>
+  <Card title="Components" href="/docs/v2/components/overview" description="The full reference for every primitive." />
+  <Card title="Theming" href="/docs/v2/theming" description="Make it look like yours." />
+  <Card title="Guides" href="/docs/v2/guides" description="Longer walkthroughs built on these pieces." />
+</Cards>

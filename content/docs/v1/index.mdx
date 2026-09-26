@@ -1,0 +1,40 @@
+---
+title: What is LetterStack?
+description: The v1 line. Security fixes only — new work happens in v2.
+icon: Sparkles
+---
+
+<Callout type="warn" title="You are reading the v1 docs">
+  v1.4 is in maintenance. It gets security fixes until March 2027 and nothing else. Use the
+  version switcher at the top of the sidebar to read the v2 docs, or follow the
+  [migration guide](/docs/v2/guides/migrating-to-v2).
+</Callout>
+
+LetterStack is a set of React components for people who publish words — layout, typography,
+subscribe forms, and archives, with no opinion about how any of it should look.
+
+## What changed in v2
+
+| Area | v1.4 | v2.0 |
+| --- | --- | --- |
+| Tokens | `--letterstack-*` | `--ls-*` |
+| Measure | pixels | `ch` units |
+| Archive | renders every row | virtualises past 200 rows |
+| `Newsletter` | one component | split into `Prose` + `SubscribeForm` |
+| Style hooks | class names | data attributes |
+
+## Still on v1?
+
+That is fine for a site that is not changing. If you are still adding features, the codemod
+does most of the upgrade for you.
+
+```npm
+npx @letterstack/codemod v2 ./src
+```
+
+<Cards>
+  <Card title="Installation" href="/docs/v1/installation" description="Install the v1 line." />
+  <Card title="Quick Start" href="/docs/v1/quick-start" description="The v1 newsletter page." />
+  <Card title="Components" href="/docs/v1/components/overview" description="What shipped in v1.4." />
+  <Card title="Migrate to v2" href="/docs/v2/guides/migrating-to-v2" description="Token renames and the Newsletter split." />
+</Cards>

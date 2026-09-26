@@ -1,0 +1,18 @@
+---
+title: Toast (draft)
+description: Not shipped yet. This page is hidden from the sidebar on purpose.
+icon: Bell
+---
+
+This page demonstrates the `!item` exclusion syntax. It is reachable at
+`/docs/v2/components/draft-toast` but never appears in the sidebar, because
+`content/docs/v2/components/meta.json` lists it as excluded.
+
+```json title="content/docs/v2/components/meta.json"
+{
+  "pages": ["overview", "button", "z...a", "!draft-toast"]
+}
+```
+
+`z...a` sweeps up anything not listed explicitly, in reverse alphabetical order, and
+`!draft-toast` removes this page from that sweep.

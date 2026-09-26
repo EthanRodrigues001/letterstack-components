@@ -1,0 +1,47 @@
+---
+title: Changelog
+description: Notable changes, newest first.
+icon: ScrollText
+---
+
+<include>../snippets/mock-banner.mdx</include>
+
+## 2.0.0 [#v2-0-0]
+
+<Callout type="warn" title="Breaking">
+  `Prose` now sets `measure` in `ch` instead of `rem`. If you overrode `--ls-measure` with a
+  pixel value, convert it.
+</Callout>
+
+- **Added** `Archive` virtualisation. Lists over 200 items render a window instead of everything.
+- **Added** `ReadingProgress`, `Estimate`, `Byline`.
+- **Changed** every component now forwards `className` to its outermost element.
+- **Changed** tokens renamed from `--letterstack-*` to `--ls-*`.
+- **Removed** `Newsletter`, which did four things badly. Use `SubscribeForm` plus `Prose`.
+
+```diff title="Migration"
+- import { Newsletter } from '@letterstack/react';
++ import { Prose, SubscribeForm } from '@letterstack/react';
+```
+
+## 1.4.2 [#v1-4-2]
+
+- **Fixed** `SubscribeForm` submitted twice when Enter was pressed while the button had focus.
+- **Fixed** focus ring clipped inside `Card` on Safari.
+
+## 1.4.0 [#v1-4-0]
+
+- **Added** `PullQuote` and `Rule`.
+- **Added** `collapsible` support to `TableOfContents`.
+- **Changed** `Badge` defaults to `variant="subtle"`.
+
+```ts title="Before and after"
+console.log(badge.variant); // [!code --]
+// 'solid'                  // [!code --]
+console.log(badge.variant); // [!code ++]
+// 'subtle'                 // [!code ++]
+```
+
+## 1.0.0 [#v1-0-0]
+
+First stable release. `Prose`, `Measure`, `Heading`, `Button`, `Card`, `Badge`, `Input`.

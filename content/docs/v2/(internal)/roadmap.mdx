@@ -1,0 +1,42 @@
+---
+title: Roadmap
+description: What is planned, what is being built, and what was deliberately left out.
+icon: Map
+---
+
+<include>../../snippets/mock-banner.mdx</include>
+
+This file lives in `content/docs/(internal)/roadmap.mdx`. The parentheses make `(internal)`
+a folder group, so the URL is `/docs/v2/roadmap` rather than `/docs/v2/internal/roadmap` — the
+folder organises the source without appearing in the route.
+
+## In progress
+
+| Item | Target | Notes |
+| --- | --- | --- |
+| `Footnote` anchoring | v2.1 | Footnotes that stay attached when a paragraph reflows |
+| RSS helper | v2.1 | `letterstack/feed` — generate Atom and RSS from the archive |
+| Email compilation | v2.2 | Table-based output for the subset that makes sense in email |
+
+## Planned
+
+- [x] Token-based theming
+- [x] Virtualised archive
+- [ ] Footnote popovers on touch devices
+- [ ] `Columns` with balanced ragging
+- [ ] A Svelte port
+
+## Deliberately out of scope
+
+- A rich text editor. There are good ones; none of them are a component library's job.
+- Analytics. Bring your own.
+- A CMS. LetterStack renders whatever you hand it.
+
+## Versioning
+
+Minor releases add components. Patch releases never change markup structure, because
+people style against it.
+
+```npm
+npm install @letterstack/react@next
+```

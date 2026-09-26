@@ -1,0 +1,48 @@
+---
+title: Quick Start
+description: The v1 newsletter page, using the Newsletter component that v2 removed.
+icon: Rocket
+---
+
+<Callout title="This page documents a removed component">
+  `Newsletter` does not exist in v2. The v2 equivalent is on
+  [Quick Start](/docs/v2/quick-start).
+</Callout>
+
+## One component, four jobs
+
+```tsx title="app/issues/[slug]/page.tsx"
+import { Newsletter } from '@letterstack/react';
+
+export default async function IssuePage({ params }: Props) {
+  const issue = await getIssue((await params).slug);
+
+  return (
+    <Newsletter
+      title="Dispatches"
+      body={issue.body}
+      subscribeAction="/api/subscribe"
+      archiveHref="/issues"
+    />
+  );
+}
+```
+
+That bundling is why it was removed: every site wanted three of the four parts and had to
+fight the fourth.
+
+## Styling it
+
+v1 styles against class names rather than data attributes.
+
+```css
+.letterstack-newsletter {
+  --letterstack-measure: 640px;
+}
+```
+
+<Callout type="warn" title="Class names are not stable in v2">
+  v2 treats class names as private and data attributes as the public API. Anything you write
+  here will need rewriting on upgrade — see
+  [Migrating to v2](/docs/v2/guides/migrating-to-v2).
+</Callout>

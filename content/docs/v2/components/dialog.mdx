@@ -1,0 +1,119 @@
+---
+title: Dialog
+description: Focus-trapped modal built on the native dialog element.
+icon: SquareArrowOutUpRight
+---
+
+<include>../../snippets/unstyled-note.mdx</include>
+
+```tsx
+import { Button, Dialog } from '@letterstack/react';
+
+<Dialog>
+  <Dialog.Trigger asChild>
+    <Button variant="outline">Manage subscription</Button>
+  </Dialog.Trigger>
+  <Dialog.Content>
+    <Dialog.Title>Manage subscription</Dialog.Title>
+    <Dialog.Description>Change cadence or unsubscribe.</Dialog.Description>
+    <Dialog.Close asChild>
+      <Button variant="ghost">Done</Button>
+    </Dialog.Close>
+  </Dialog.Content>
+</Dialog>
+```
+
+## Props [#dialog-props]
+
+<TypeTable
+  type={{
+    open: {
+      type: 'boolean',
+      description: 'Controlled open state. Requires onOpenChange.',
+    },
+    defaultOpen: {
+      type: 'boolean',
+      description: 'Uncontrolled initial state.',
+      default: 'false',
+    },
+    onOpenChange: {
+      type: '(open: boolean) => void',
+      parameters: [{ name: 'open', description: 'Whether the dialog is now open.' }],
+      returns: 'void',
+    },
+    modal: {
+      type: 'boolean',
+      description: 'Modal dialogs trap focus and block the page. Non-modal ones do neither.',
+      default: 'true',
+    },
+    dismissible: {
+      type: 'boolean',
+      description: 'Allow Escape and outside clicks to close. Turn it off for destructive confirmations.',
+      default: 'true',
+    },
+    returnFocus: {
+      type: 'boolean | (() => HTMLElement | null)',
+      description: 'Where focus goes on close. Defaults to the trigger.',
+      default: 'true',
+    },
+  }}
+/>
+
+## What the native element gives you
+
+Built on `<dialog>` with `showModal()`, so the browser handles the top layer, the backdrop,
+and the initial focus move. LetterStack adds the scroll lock and the return-focus behaviour.
+
+<Steps>
+  <Step>
+    ### Open
+    Focus moves to the first tabbable element inside, or to `Dialog.Content` if there is none.
+  </Step>
+  <Step>
+    ### While open
+    Focus is trapped. The page behind is inert and does not scroll.
+  </Step>
+  <Step>
+    ### Close
+    Focus returns to the trigger, or wherever `returnFocus` points.
+  </Step>
+</Steps>
+
+## Confirmations
+
+Turn off `dismissible` when an accidental Escape would lose work.
+
+```tsx
+<Dialog dismissible={false}>
+  <Dialog.Content>
+    <Dialog.Title>Delete this issue?</Dialog.Title>
+    <Dialog.Description>This cannot be undone.</Dialog.Description>
+    <Dialog.Close asChild>
+      <Button variant="ghost">Keep it</Button>
+    </Dialog.Close>
+    <Button variant="solid" onClick={remove}>Delete</Button>
+  </Dialog.Content>
+</Dialog>
+```
+
+<Callout type="error" title="Never trap someone with no way out">
+  With `dismissible={false}` there must be a visible close or cancel control. Removing
+  Escape and leaving no button is a dead end for keyboard users.
+</Callout>
+
+## Questions that keep coming up
+
+<Accordions type="single">
+  <Accordion title="Can I scroll long content?">
+    Put the scroll container inside `Dialog.Content`, not on it. Scrolling the content
+    element itself breaks the sticky title.
+  </Accordion>
+  <Accordion title="Why is my dialog behind something?">
+    `<dialog>` renders in the top layer, above every `z-index`. If something covers it, that
+    something is also in the top layer — a popover, or another dialog.
+  </Accordion>
+  <Accordion title="Does it work without JavaScript?">
+    No. The trigger needs a click handler. Server-render the content behind a link if it has
+    to work without JS.
+  </Accordion>
+</Accordions>

@@ -1,0 +1,147 @@
+---
+title: Button
+description: Solid, outline, ghost, and link variants with a real pending state.
+icon: MousePointerClick
+---
+
+<include>../../snippets/unstyled-note.mdx</include>
+
+```tsx
+import { Button } from '@letterstack/react';
+
+<Button variant="solid">Subscribe</Button>
+```
+
+## Variants
+
+```tsx tab="Solid"
+<Button variant="solid">Subscribe</Button>
+```
+
+```tsx tab="Outline"
+<Button variant="outline">Preview</Button>
+```
+
+```tsx tab="Ghost"
+<Button variant="ghost">Cancel</Button>
+```
+
+```tsx tab="Link"
+<Button variant="link" href="/issues">Read the archive</Button>
+```
+
+<Callout title="href changes the element">
+  Pass `href` and you get an `<a>`; leave it off and you get a `<button>`. The `variant="link"`
+  styling is independent of which element renders.
+</Callout>
+
+## Props [#button-props]
+
+<TypeTable
+  type={{
+    variant: {
+      type: "'solid' | 'outline' | 'ghost' | 'link'",
+      default: "'solid'",
+    },
+    size: {
+      type: "'sm' | 'md' | 'lg'",
+      description: 'Affects padding and font size, not the touch target — that stays 44px.',
+      default: "'md'",
+    },
+    pending: {
+      type: 'boolean',
+      description: 'Disables interaction, sets aria-busy, and swaps in the spinner slot.',
+      default: 'false',
+    },
+    disabled: {
+      type: 'boolean',
+      description: 'Uses aria-disabled rather than the disabled attribute, so the button stays focusable and its tooltip stays reachable.',
+      default: 'false',
+    },
+    href: {
+      type: 'string',
+      description: 'Renders an anchor instead of a button.',
+    },
+    asChild: {
+      type: 'boolean',
+      description: 'Merge props into the single child element instead of rendering one.',
+      default: 'false',
+    },
+    onClick: {
+      type: '(event: MouseEvent) => void',
+      description: 'Not called while pending or disabled.',
+      parameters: [{ name: 'event', description: 'The native click event.' }],
+      returns: 'void',
+    },
+  }}
+/>
+
+## Pending state
+
+`pending` is the whole reason this component exists rather than a styled `<button>`. It
+keeps the width stable so the layout does not jump when the label is replaced.
+
+```tsx lineNumbers
+'use client';
+
+import { Button } from '@letterstack/react';
+import { useState } from 'react';
+
+export function SubscribeButton() {
+  const [pending, setPending] = useState(false);
+
+  return (
+    <Button
+      pending={pending} // [!code highlight]
+      onClick={async () => {
+        setPending(true);
+        try {
+          await subscribe();
+        } finally {
+          setPending(false);
+        }
+      }}
+    >
+      Subscribe
+    </Button>
+  );
+}
+```
+
+## Composing with asChild
+
+Use `asChild` when something else owns the element — a framework `Link`, for instance.
+
+```tsx
+import Link from 'next/link';
+
+<Button asChild variant="link">
+  <Link href="/issues">Read the archive</Link>
+</Button>
+```
+
+<Callout type="error" title="asChild needs exactly one child">
+  Two children, or a text node, will throw. The component has one element to merge into and
+  no way to choose.
+</Callout>
+
+## Accessibility
+
+- `pending` sets `aria-busy="true"` and leaves the accessible name alone.
+- `disabled` uses `aria-disabled`, so the button keeps focus and any tooltip stays reachable.
+- The rendered element is a real `button` or `a`. No `div` with a click handler.
+
+```txt title="Keyboard"
+Tab          move focus to the button
+Enter        activate (button and anchor)
+Space        activate (button only)
+```
+
+## Data attributes
+
+| Attribute | Values |
+| --- | --- |
+| `data-ls-button` | present on the root |
+| `data-variant` | `solid`, `outline`, `ghost`, `link` |
+| `data-size` | `sm`, `md`, `lg` |
+| `data-pending` | present while pending |

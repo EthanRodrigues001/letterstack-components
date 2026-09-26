@@ -1,45 +1,54 @@
-# .
+# letterstack-components
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+A [Fumadocs](https://fumadocs.dev) documentation site for **LetterStack**, a fictional React
+component library for newsletters and editorial layouts.
 
-Run development server:
+All content is mock — invented props, invented version history. The repo exists to exercise
+the Fumadocs feature set end to end against content that looks like real documentation.
+
+## Run it
 
 ```bash
+npm install
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open <http://localhost:3000/docs> — it redirects to `/docs/v2`.
 
-## Explore
+## Scripts
 
-In the project, you can see:
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server on :3000 |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run types:check` | `next typegen && tsc --noEmit` |
+| `npm run check:icons` | Validate every icon name used in `content/docs` |
+| `npm run lint` | Currently broken — see `context/01-project.md` |
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+Run `npm run check:icons` after editing content. An icon name Lucide does not export fails
+soft: the build succeeds and you get one ragged sidebar row.
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+## Layout
 
-### Fumadocs MDX
+- Next.js 16 (Turbopack) + React 19 + Tailwind 4
+- Fumadocs 16 with the **Glass** layout (`@fumadocs/base-ui` aliased to `fumadocs-ui`)
+- Content in `content/docs`, two version roots (`v2`, `v1`) behind the sidebar dropdown
 
-Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
+| Path | Purpose |
+| --- | --- |
+| `lib/source.ts` | Content collection, MDX plugin config, page-tree loader |
+| `lib/layout.shared.tsx` | Nav title and GitHub link |
+| `components/mdx.tsx` | MDX component registry |
+| `app/docs/layout.tsx` | Glass layout and the root dropdown |
+| `scripts/check-icons.mjs` | Icon name validation |
+| `content/docs/snippets/` | `<include>` fragments, excluded from the collection |
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+## Context for new contributors
 
-## Learn More
+[`context/`](context/) is a checked-in pack written for someone — or some agent — picking
+this repo up cold. Start at [`context/README.md`](context/README.md).
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+It covers the architecture, the page conventions as actually used here, the MDX features
+that are enabled, and a list of gotchas that cost real time, including two upstream
+fumadocs-ui behaviours that fail silently.

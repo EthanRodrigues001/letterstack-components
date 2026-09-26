@@ -1,0 +1,71 @@
+---
+title: Badge
+description: A label. Nothing more.
+icon: Tag
+---
+
+<include>../../snippets/unstyled-note.mdx</include>
+
+```tsx
+import { Badge } from '@letterstack/react';
+
+<Badge>Draft</Badge>
+```
+
+## Variants
+
+```tsx tab="Subtle"
+<Badge variant="subtle">Draft</Badge>
+```
+
+```tsx tab="Solid"
+<Badge variant="solid">New</Badge>
+```
+
+```tsx tab="Outline"
+<Badge variant="outline">Archived</Badge>
+```
+
+## Props [#badge-props]
+
+<TypeTable
+  type={{
+    variant: {
+      type: "'subtle' | 'solid' | 'outline'",
+      default: "'subtle'",
+    },
+    tone: {
+      type: "'neutral' | 'accent' | 'positive' | 'caution' | 'critical'",
+      description: 'Maps to a token pair. Never the only carrier of meaning — keep the text.',
+      default: "'neutral'",
+    },
+    asChild: {
+      type: 'boolean',
+      default: 'false',
+    },
+  }}
+/>
+
+<Callout type="warn" title="Colour is not a label">
+  A red badge that says "Live" and a green badge that says "Live" mean the same thing to a
+  screen reader. If the tone carries information, put it in the text too.
+</Callout>
+
+## In a list
+
+Badges are inline elements, so they sit inside text without breaking the line box.
+
+```tsx
+<PostCard
+  title="Issue 41"
+  badge={<Badge tone="accent">Members only</Badge>}
+/>
+```
+
+## Data attributes
+
+| Attribute | Values |
+| --- | --- |
+| `data-ls-badge` | present on the root |
+| `data-variant` | `subtle`, `solid`, `outline` |
+| `data-tone` | `neutral`, `accent`, `positive`, `caution`, `critical` |

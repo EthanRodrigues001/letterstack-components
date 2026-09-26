@@ -1,0 +1,7 @@
+{
+  "$schema": "https://fumadocs.dev/schemas/meta.json",
+  "pages": [
+    "v2",
+    "v1"
+  ]
+}

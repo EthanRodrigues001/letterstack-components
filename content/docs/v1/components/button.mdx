@@ -1,0 +1,45 @@
+---
+title: Button
+description: The v1 button. Three variants, no pending state.
+icon: MousePointerClick
+---
+
+```tsx
+import { Button } from '@letterstack/react';
+
+<Button variant="solid">Subscribe</Button>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    variant: {
+      type: "'solid' | 'outline' | 'ghost'",
+      description: "v2 adds a fourth variant, 'link'.",
+      default: "'solid'",
+    },
+    size: {
+      type: "'sm' | 'md' | 'lg'",
+      default: "'md'",
+    },
+    disabled: {
+      type: 'boolean',
+      description: 'Uses the disabled attribute, so the button leaves the tab order. v2 switched to aria-disabled.',
+      default: 'false',
+    },
+  }}
+/>
+
+<Callout title="No pending prop">
+  v1 has no built-in pending state. Most projects wrapped the button and swapped the label,
+  which is what `pending` in [v2](/docs/v2/components/button) replaced.
+</Callout>
+
+## Styling
+
+```css
+.letterstack-button--solid {
+  border-radius: 0;
+}
+```

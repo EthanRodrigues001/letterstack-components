@@ -1,0 +1,52 @@
+---
+title: What is LetterStack?
+description: An unstyled, composable component library for building newsletters, editorial layouts, and reading experiences on the web.
+icon: Sparkles
+---
+
+LetterStack is a set of React components for people who publish words. It gives you the
+primitives behind a newsletter or editorial site — layout, typography, subscribe forms,
+archives, reading progress — without deciding how any of it should look.
+
+<Callout title="Mock documentation">
+  Everything on this site is placeholder content while the library is being built. APIs,
+  prop names, and version numbers here are not real yet.
+</Callout>
+
+## Why another component library?
+
+Most component libraries are built for dashboards. Tables, charts, date pickers, command
+palettes. Publishing has a different set of problems: long-form measure, footnotes that
+stay attached to their paragraph, an archive that stays fast at ten thousand posts, and a
+subscribe form that survives being embedded in someone else's page.
+
+LetterStack ships those pieces instead.
+
+## Principles
+
+<Cards>
+  <Card title="Unstyled by default" description="Components ship with structure, behavior, and accessibility. Styling is yours — Tailwind, CSS modules, vanilla CSS, whatever." />
+  <Card title="Composable, not configurable" description="No 40-prop components. Small parts you assemble, in the spirit of Radix and Base UI." />
+  <Card title="Server-first" description="Every component renders on the server. Client JavaScript is opt-in, per component." />
+  <Card title="Copy, don't install" description="Own the source. Pull a component into your repo with the CLI and edit it freely." />
+</Cards>
+
+## What's in the box
+
+| Area | Components |
+| --- | --- |
+| Layout | `Prose`, `Measure`, `Columns`, `Rule` |
+| Typography | `Heading`, `Lede`, `PullQuote`, `Footnote` |
+| Publishing | `SubscribeForm`, `Archive`, `PostCard`, `Byline` |
+| Reading | `ReadingProgress`, `TableOfContents`, `Estimate` |
+| Primitives | `Button`, `Badge`, `Card`, `Input`, `Tabs`, `Dialog` |
+
+## Where to go next
+
+<Cards>
+  <Card title="Installation" href="/docs/v2/installation" description="Add LetterStack to a Next.js, Vite, or Remix app." />
+  <Card title="Quick Start" href="/docs/v2/quick-start" description="Ship a working newsletter page in about five minutes." />
+  <Card title="Components" href="/docs/v2/components/overview" description="Browse the full component reference." />
+  <Card title="Theming" href="/docs/v2/theming" description="Design tokens, dark mode, and overriding styles." />
+  <Card title="Guides" href="/docs/v2/guides" description="Longer walkthroughs that combine several components." />
+</Cards>

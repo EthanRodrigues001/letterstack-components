@@ -1,0 +1,110 @@
+---
+title: Input
+description: Text input with a label, description, and error region wired for screen readers.
+icon: TextCursorInput
+---
+
+<include>../../snippets/unstyled-note.mdx</include>
+
+```tsx
+import { Input } from '@letterstack/react';
+
+<Input name="email" type="email">
+  <Input.Label>Email</Input.Label>
+  <Input.Field placeholder="you@example.com" />
+  <Input.Description>We send one issue every other Thursday.</Input.Description>
+  <Input.Error />
+</Input>
+```
+
+The wrapper generates the ids and wires `aria-describedby` and `aria-invalid` across the
+slots. That plumbing is the reason to use it over a bare `<input>`.
+
+## Props [#input-props]
+
+<TypeTable
+  type={{
+    name: {
+      type: 'string',
+      description: 'Form field name. Also seeds the generated element ids.',
+      required: true,
+    },
+    type: {
+      type: "'text' | 'email' | 'url' | 'search' | 'tel' | 'password'",
+      default: "'text'",
+    },
+    invalid: {
+      type: 'boolean',
+      description: 'Sets aria-invalid and reveals Input.Error. Usually driven by your validation.',
+      default: 'false',
+    },
+    error: {
+      type: 'ReactNode',
+      description: 'Message rendered inside Input.Error. Announced politely on change.',
+    },
+    required: {
+      type: 'boolean',
+      description: 'Adds the required attribute. The label gains a data-required marker to style.',
+      default: 'false',
+    },
+    onValueChange: {
+      type: '(value: string) => void',
+      parameters: [{ name: 'value', description: 'The new input value.' }],
+      returns: 'void',
+    },
+  }}
+/>
+
+## Validation
+
+`Input` does not validate. It renders the state you give it, so whatever owns your form
+schema stays in charge.
+
+```tsx tab="Server action" lineNumbers
+import { Input } from '@letterstack/react';
+
+export function SubscribeFields({ errors }: { errors?: { email?: string } }) {
+  return (
+    <Input name="email" type="email" required invalid={Boolean(errors?.email)}>
+      <Input.Label>Email</Input.Label>
+      <Input.Field />
+      <Input.Error>{errors?.email}</Input.Error>
+    </Input>
+  );
+}
+```
+
+```tsx tab="React Hook Form" lineNumbers
+const { register, formState } = useForm<Values>();
+
+<Input name="email" type="email" invalid={Boolean(formState.errors.email)}>
+  <Input.Label>Email</Input.Label>
+  <Input.Field {...register('email')} />
+  <Input.Error>{formState.errors.email?.message}</Input.Error>
+</Input>;
+```
+
+<Callout type="warn" title="Placeholders are not labels">
+  A placeholder disappears the moment someone types, and screen readers treat it
+  inconsistently. Always render `Input.Label`; hide it visually if the design demands it.
+</Callout>
+
+## Announcing errors
+
+`Input.Error` is `aria-live="polite"`. Errors are announced when they appear rather than
+interrupting whatever is being read.
+
+```txt title="Announcement order"
+1. "Email, edit text, required"
+2. (user submits)
+3. "Enter an email address"
+```
+
+## Data attributes
+
+| Attribute | Values |
+| --- | --- |
+| `data-ls-input` | present on the root |
+| `data-invalid` | present when `invalid` |
+| `data-required` | present on the label when `required` |
+| `data-filled` | present once the field has a value |

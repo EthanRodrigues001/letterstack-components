@@ -1,0 +1,6 @@
+{
+  "$schema": "https://fumadocs.dev/schemas/meta.json",
+  "title": "Guides",
+  "icon": "Compass",
+  "pages": ["..."]
+}

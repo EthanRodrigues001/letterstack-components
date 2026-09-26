@@ -1,0 +1,106 @@
+---
+title: Archive page
+description: An index that stays fast whether it lists fifty issues or five thousand.
+icon: Library
+---
+
+<include>../../snippets/mock-banner.mdx</include>
+
+## Grouping
+
+`Archive` groups before it renders, so the group headers are real landmarks rather than
+styled list items.
+
+```tsx tab="By year"
+<Archive items={issues} groupBy="year">
+  {(issue) => <PostCard {...issue} />}
+</Archive>
+```
+
+```tsx tab="By tag"
+<Archive items={issues} groupBy={(issue) => issue.tags[0] ?? 'Untagged'}>
+  {(issue) => <PostCard {...issue} />}
+</Archive>
+```
+
+```tsx tab="Flat"
+<Archive items={issues}>
+  {(issue) => <PostCard {...issue} />}
+</Archive>
+```
+
+## Virtualisation
+
+Above `threshold` items, `Archive` renders a window and reserves the remaining height.
+Below it, everything renders, so short archives stay crawlable and print correctly.
+
+<TypeTable
+  type={{
+    items: {
+      type: 'T[]',
+      description: 'The full list. Sorting is yours; Archive does not reorder.',
+      required: true,
+    },
+    groupBy: {
+      type: "'year' | 'month' | ((item: T) => string)",
+      description: 'Omit for a flat list.',
+    },
+    threshold: {
+      type: 'number',
+      description: 'Item count above which the list virtualises.',
+      default: '200',
+    },
+    estimateSize: {
+      type: '(item: T) => number',
+      description: 'Estimated row height in pixels. A rough guess is enough.',
+      default: '() => 96',
+    },
+    onReachEnd: {
+      type: '() => void',
+      description: 'Fires once when the last window comes into view.',
+      parameters: [],
+      returns: 'void',
+    },
+  }}
+/>
+
+<Callout type="warn" title="Virtualised lists and Cmd+F">
+  Browser find only searches rendered rows. If in-page search matters more than scroll
+  performance, raise `threshold` past your item count and accept the markup cost.
+</Callout>
+
+## Pagination instead
+
+If you would rather paginate than virtualise, `Archive` takes a slice and renders it —
+there is no internal page state to fight.
+
+```tsx title="app/issues/page.tsx" lineNumbers=12
+const PER_PAGE = 25;
+
+export default async function ArchivePage({ searchParams }: Props) {
+  const page = Number((await searchParams).page ?? 1);
+  const issues = await getIssues();
+  const slice = issues.slice((page - 1) * PER_PAGE, page * PER_PAGE); // [!code word:slice]
+
+  return (
+    <>
+      <Archive items={slice} groupBy="year">
+        {(issue) => <PostCard {...issue} />}
+      </Archive>
+      <Pagination page={page} total={Math.ceil(issues.length / PER_PAGE)} />
+    </>
+  );
+}
+```
+
+## Search
+
+`Archive` has no built-in search. Filter `items` yourself — a client-side `filter` is
+enough up to a few thousand rows, and past that you want a real index anyway.
+
+```tsx
+const visible = useMemo(
+  () => issues.filter((issue) => issue.title.toLowerCase().includes(query.toLowerCase())),
+  [issues, query],
+);
+```

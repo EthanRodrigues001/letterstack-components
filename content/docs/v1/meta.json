@@ -1,0 +1,14 @@
+{
+  "$schema": "https://fumadocs.dev/schemas/meta.json",
+  "title": "v1.4",
+  "description": "Legacy, security fixes only",
+  "icon": "Archive",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "installation",
+    "quick-start",
+    "components"
+  ]
+}

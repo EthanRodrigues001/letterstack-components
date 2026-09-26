@@ -1,0 +1,113 @@
+---
+title: Newsletter layout
+description: Build an issue page that reads well on a phone and in a 27-inch window.
+icon: Newspaper
+---
+
+<include>../../snippets/mock-banner.mdx</include>
+
+## The problem with max-width
+
+A fixed `max-width` in pixels looks right at one font size. Bump the base size for
+accessibility and the line length grows past comfortable reading. `Prose` sets its measure
+in `ch`, so the line length tracks the font instead of fighting it.
+
+```tsx title="app/issues/[slug]/page.tsx"
+import { Prose } from '@letterstack/react';
+
+<Prose measure="comfortable">{children}</Prose>
+```
+
+<TypeTable
+  type={{
+    measure: {
+      type: "'tight' | 'comfortable' | 'wide'",
+      description: '52ch, 66ch, or 80ch respectively.',
+      default: "'comfortable'",
+    },
+    leading: {
+      type: "'snug' | 'normal' | 'relaxed'",
+      description: 'Line height. Overrides --ls-leading for this subtree.',
+      default: "'normal'",
+    },
+    asChild: {
+      type: 'boolean',
+      description: 'Render into the single child element instead of emitting a wrapper.',
+      default: 'false',
+    },
+  }}
+/>
+
+## A masthead that gets out of the way
+
+### Stack it on mobile, inline it above 40rem [step]
+
+```tsx
+<Masthead>
+  <Masthead.Title>Dispatches</Masthead.Title>
+  <Masthead.Meta>Issue 41 · Every other Thursday</Masthead.Meta>
+</Masthead>
+```
+
+### Keep the first paragraph above the fold [step]
+
+The masthead is `position: static` on purpose. If you make it sticky, cap its height —
+otherwise the reader lands on furniture instead of text.
+
+```css
+[data-ls-masthead] {
+  position: sticky;
+  top: 0;
+  max-height: 4rem; /* [!code highlight] */
+}
+```
+
+### Add the lede [step]
+
+`Lede` is a paragraph with a larger size and a tighter measure. It exists so you stop
+reaching for `<p className="text-xl">`.
+
+```tsx
+<Prose>
+  <Lede>
+    Six months of reader mail, sorted into the four arguments people keep having.
+  </Lede>
+  <p>The first argument is about length.</p>
+</Prose>
+```
+
+## Footnotes
+
+Footnotes render inline on wide viewports and collapse into a popover below `48rem`.
+
+```tsx
+<p>
+  The archive has grown past what a single page should render
+  <Footnote id="fn-1">
+    Roughly 1,400 issues as of this writing.
+  </Footnote>
+  , which is why Archive virtualises.
+</p>
+```
+
+<Callout type="error" title="Duplicate ids">
+  Footnote ids must be unique per page. Two footnotes with the same id will both scroll to
+  the first one, and the second will be unreachable by keyboard.
+</Callout>
+
+## Result
+
+<Steps>
+  <Step>
+    ### Structure
+    `Masthead`, then `Prose` containing `Lede` and the body.
+  </Step>
+  <Step>
+    ### Rhythm
+    One `--ls-step` value drives every margin, so nothing needs a manual override.
+  </Step>
+  <Step>
+    ### Client JavaScript
+    Zero, unless you added `ReadingProgress` or a footnote popover.
+  </Step>
+</Steps>

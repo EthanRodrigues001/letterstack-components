@@ -1,0 +1,95 @@
+---
+title: Migrating to v2
+description: Token renames, the Newsletter removal, and the codemod that handles both.
+icon: ArrowRightLeft
+---
+
+<include>../../snippets/mock-banner.mdx</include>
+
+## Run the codemod first [step]
+
+It handles the token rename and the `Newsletter` split. Commit before running it — it edits
+files in place.
+
+```npm
+npx @letterstack/codemod v2 ./src
+```
+
+```txt title="output"
+✓ 41 files scanned
+✓ 12 token references renamed
+✓ 3 <Newsletter> usages split into <Prose> + <SubscribeForm>
+! 1 file needs review: src/app/legacy/page.tsx
+```
+
+## Rename your tokens [step]
+
+Everything moved from `--letterstack-*` to `--ls-*`.
+
+```css
+:root {
+  --letterstack-ink: #1a1a1a;    /* [!code --] */
+  --letterstack-measure: 640px;  /* [!code --] */
+  --ls-ink: oklch(0.22 0.01 265); /* [!code ++] */
+  --ls-measure: 66ch;             /* [!code ++] */
+}
+```
+
+<Callout type="warn" title="Pixel measures">
+  `--ls-measure` expects a `ch` value. A pixel value still works but stops tracking the font
+  size, which was the point of the change. Divide by roughly 8 to convert: `640px` → `80ch`.
+</Callout>
+
+## Replace Newsletter [step]
+
+`Newsletter` bundled a masthead, a body, a subscribe form, and an archive link. It is gone.
+Compose the pieces instead.
+
+```tsx tab="v1"
+<Newsletter
+  title="Dispatches"
+  body={issue.body}
+  subscribeAction="/api/subscribe"
+  archiveHref="/issues"
+/>
+```
+
+```tsx tab="v2"
+<>
+  <Masthead>
+    <Masthead.Title>Dispatches</Masthead.Title>
+  </Masthead>
+  <Prose>{issue.body}</Prose>
+  <SubscribeForm action="/api/subscribe">
+    <SubscribeForm.Input />
+    <SubscribeForm.Submit>Subscribe</SubscribeForm.Submit>
+  </SubscribeForm>
+  <a href="/issues">Read the archive</a>
+</>
+```
+
+## Check your style overrides [step]
+
+If you styled against class names, they changed. Data attributes did not, and they are the
+supported target.
+
+```css
+.letterstack-button--solid { }  /* [!code --] */
+[data-ls-button][data-variant='solid'] { } /* [!code ++] */
+```
+
+## Known issues
+
+<Accordions type="single">
+  <Accordion title="The codemod skipped a file">
+    It skips files where `Newsletter` receives spread props, because it cannot tell which
+    prop goes where. Those need a manual split.
+  </Accordion>
+  <Accordion title="Focus rings look different">
+    v2 uses `:focus-visible` throughout. Keyboard focus is unchanged; mouse clicks no longer
+    draw a ring.
+  </Accordion>
+  <Accordion title="Archive renders fewer rows than before">
+    That is virtualisation. Set `threshold={Infinity}` to restore v1 behaviour.
+  </Accordion>
+</Accordions>

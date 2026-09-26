@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'fumadocs-ui/css/generated/glass.css';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 
@@ -9,4 +10,30 @@ html {
 html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
+}
+
+/*
+ * Glass sidebar: give an expanded folder's children an indent and a rail, so a
+ * nested page reads as belonging to its folder instead of sitting flush with it.
+ *
+ * The glass layout renders a folder as a base-ui Collapsible. Two elements inside
+ * #nd-sidebar carry data-open/data-closed: the Collapsible root (always
+ * `mt-4 first:mt-0`) and the panel holding the children. Excluding the `mt-4`
+ * token leaves only the panel.
+ */
+#nd-sidebar [data-open]:not([class~='mt-4']),
+#nd-sidebar [data-closed]:not([class~='mt-4']) {
+  margin-inline-start: 1rem;
+  border-inline-start: 1px solid var(--color-fd-border);
+  padding-inline-start: 0.5rem;
+}
+
+/*
+ * A separator immediately followed by a folder stacked two `mt-4` margins, which
+ * made one group heading sit twice as far from its neighbour as the next. Folders
+ * already act as their own heading, so drop the folder's margin in that case.
+ */
+#nd-sidebar p + [data-open][class~='mt-4'],
+#nd-sidebar p + [data-closed][class~='mt-4'] {
+  margin-top: 0;
 }

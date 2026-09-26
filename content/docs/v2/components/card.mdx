@@ -1,0 +1,100 @@
+---
+title: Card
+description: A bordered container with optional header, body, and footer slots.
+icon: SquareStack
+---
+
+<include>../../snippets/unstyled-note.mdx</include>
+
+```tsx
+import { Card } from '@letterstack/react';
+
+<Card>
+  <Card.Header>
+    <Card.Title>Issue 41</Card.Title>
+    <Card.Description>Every other Thursday</Card.Description>
+  </Card.Header>
+  <Card.Body>Six months of reader mail, sorted.</Card.Body>
+  <Card.Footer>
+    <Button variant="link" href="/issues/41">Read</Button>
+  </Card.Footer>
+</Card>
+```
+
+## Slots
+
+Each slot is optional and renders nothing when absent — no empty padding left behind.
+
+<Files>
+  <Folder name="Card" defaultOpen>
+    <File name="Card.Header" />
+    <File name="Card.Title" />
+    <File name="Card.Description" />
+    <File name="Card.Body" />
+    <File name="Card.Footer" />
+    <File name="Card.Media" />
+  </Folder>
+</Files>
+
+## Props [#card-props]
+
+<TypeTable
+  type={{
+    interactive: {
+      type: 'boolean',
+      description: 'Adds a focus ring and hover state. Requires href or an onClick somewhere inside.',
+      default: 'false',
+    },
+    href: {
+      type: 'string',
+      description: 'Makes the whole card a link. The title becomes the accessible name.',
+    },
+    orientation: {
+      type: "'vertical' | 'horizontal'",
+      description: 'Horizontal puts Card.Media beside the content instead of above it.',
+      default: "'vertical'",
+    },
+    asChild: {
+      type: 'boolean',
+      default: 'false',
+    },
+  }}
+/>
+
+## Clickable cards
+
+A card-wide link wrapping other links produces nested interactive elements, which is
+invalid and behaves unpredictably. `href` on `Card` uses an overlay anchor instead, so
+links inside the card still work.
+
+```tsx
+<Card href="/issues/41" interactive>
+  <Card.Title>Issue 41</Card.Title>
+  <Card.Body>
+    Featuring <a href="/authors/ada">Ada</a> {/* [!code highlight] */}
+  </Card.Body>
+</Card>
+```
+
+<Callout title="Why an overlay?">
+  The overlay anchor sits above the card but below any other interactive element, so the
+  inner link wins the click and the rest of the card still navigates.
+</Callout>
+
+## With media
+
+```tsx
+<Card orientation="horizontal">
+  <Card.Media>
+    <img src="/covers/41.webp" alt="" />
+  </Card.Media>
+  <Card.Header>
+    <Card.Title>Issue 41</Card.Title>
+  </Card.Header>
+</Card>
+```
+
+<Callout type="idea" title="Decorative images">
+  `alt=""` is correct when the title already describes the card. An empty alt removes the
+  image from the accessibility tree; a missing alt makes the screen reader read the filename.
+</Callout>

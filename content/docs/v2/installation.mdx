@@ -1,0 +1,142 @@
+---
+title: Installation
+description: Add LetterStack to a new or existing project.
+icon: Download
+---
+
+<include>../snippets/mock-banner.mdx</include>
+
+LetterStack targets React 19 and above. Server Components are supported but never required.
+
+## Requirements
+
+<TypeTable
+  type={{
+    react: {
+      type: '>= 19.0.0',
+      description: 'React 19 or newer. The compiler is supported but optional.',
+      required: true,
+    },
+    node: {
+      type: '>= 20.0.0',
+      description: 'Node 20 LTS or newer, for the CLI and the build-time codemods.',
+      required: true,
+    },
+    typescript: {
+      type: '>= 5.5.0',
+      description: 'Optional. Types ship with the package either way.',
+      default: 'latest',
+    },
+    tailwindcss: {
+      type: '>= 4.0.0',
+      description: 'Optional, and only needed for the default preset.',
+      typeDescriptionLink: '/docs/v2/theming',
+    },
+  }}
+/>
+
+## Install the package [step]
+
+```npm
+npm install @letterstack/react
+```
+
+The package manager you pick here is remembered for every install block on the site.
+
+<include>../snippets/peer-deps.mdx</include>
+
+## Wire up the provider [step]
+
+`LetterStackProvider` supplies the theme context and the reading-progress observer. Mount
+it once, as high in the tree as you can.
+
+```tsx tab="Next.js" title="app/layout.tsx"
+import '@letterstack/react/styles.css';
+import { LetterStackProvider } from '@letterstack/react';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <LetterStackProvider>{children}</LetterStackProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+```tsx tab="Vite" title="src/main.tsx"
+import '@letterstack/react/styles.css';
+import { LetterStackProvider } from '@letterstack/react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+
+createRoot(document.getElementById('root')!).render(
+  <LetterStackProvider>
+    <App />
+  </LetterStackProvider>,
+);
+```
+
+```tsx tab="Remix" title="app/root.tsx"
+import styles from '@letterstack/react/styles.css?url';
+import { LetterStackProvider } from '@letterstack/react';
+
+export const links = () => [{ rel: 'stylesheet', href: styles }];
+
+export default function App() {
+  return <LetterStackProvider>{/* ... */}</LetterStackProvider>;
+}
+```
+
+## Verify the install [step]
+
+```tsx title="app/page.tsx"
+import { Button } from '@letterstack/react';
+
+export default function Page() {
+  return <Button variant="solid">It works</Button>; // [!code highlight]
+}
+```
+
+Run the dev server. If the button renders unstyled, the stylesheet import is missing —
+see [Theming](/docs/v2/theming).
+
+## Owning the source instead
+
+If you would rather vendor the components than depend on them, the CLI copies files into
+your repo and steps out of the way.
+
+```npm
+npx letterstack init
+```
+
+```npm
+npx letterstack add button card subscribe-form
+```
+
+The result is plain files you can edit:
+
+<Files>
+  <Folder name="components" defaultOpen>
+    <Folder name="letterstack" defaultOpen>
+      <File name="button.tsx" />
+      <File name="card.tsx" />
+      <File name="subscribe-form.tsx" />
+    </Folder>
+  </Folder>
+  <File name="letterstack.config.ts" />
+  <File name="package.json" />
+</Files>
+
+<Callout type="info" title="Both at once is fine">
+  Vendored components import their primitives from `@letterstack/react`, so you can copy
+  the two components you want to redesign and install the rest.
+</Callout>
+
+## Next
+
+<Cards>
+  <Card title="Quick Start" href="/docs/v2/quick-start" description="Build a newsletter page in five minutes." />
+  <Card title="Theming" href="/docs/v2/theming" description="Design tokens, dark mode, and overrides." />
+</Cards>

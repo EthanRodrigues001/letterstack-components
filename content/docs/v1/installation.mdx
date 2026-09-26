@@ -1,0 +1,54 @@
+---
+title: Installation
+description: Install the v1 line and pin it.
+icon: Download
+---
+
+<Callout type="warn" title="Maintenance branch">
+  New projects should start on [v2](/docs/v2/installation). These instructions exist for
+  sites that are not upgrading yet.
+</Callout>
+
+## Install
+
+Pin the minor so a stray `^` does not pull you onto v2.
+
+```npm
+npm install @letterstack/react@~1.4.0
+```
+
+## Requirements
+
+<TypeTable
+  type={{
+    react: {
+      type: '>= 18.2.0',
+      description: 'v1 predates React 19. It runs on 19 but is not tested against it.',
+      required: true,
+    },
+    node: {
+      type: '>= 18.0.0',
+      description: 'Node 18 or newer.',
+      required: true,
+    },
+  }}
+/>
+
+## Provider
+
+```tsx title="app/layout.tsx"
+import '@letterstack/react/styles.css';
+import { LetterStackProvider } from '@letterstack/react';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <LetterStackProvider>{children}</LetterStackProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+The provider API did not change in v2, so this file needs no edits when you upgrade.

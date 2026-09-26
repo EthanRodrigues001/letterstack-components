@@ -1,0 +1,41 @@
+---
+title: Card
+description: The v1 card. Header and body only.
+icon: SquareStack
+---
+
+```tsx
+import { Card } from '@letterstack/react';
+
+<Card>
+  <Card.Header>
+    <Card.Title>Issue 41</Card.Title>
+  </Card.Header>
+  <Card.Body>Six months of reader mail, sorted.</Card.Body>
+</Card>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    interactive: {
+      type: 'boolean',
+      description: 'Adds a hover state.',
+      default: 'false',
+    },
+    href: {
+      type: 'string',
+      description: 'Wraps the whole card in an anchor. Nested links inside break — v2 fixed this with an overlay anchor.',
+    },
+  }}
+/>
+
+<Callout type="error" title="Known issue, not fixed in v1">
+  A card with `href` that also contains a link produces nested anchors. The fix required a
+  markup change, so it shipped in [v2](/docs/v2/components/card) instead.
+</Callout>
+
+## Missing in v1
+
+`Card.Description`, `Card.Footer`, `Card.Media`, and `orientation` were all added in v2.

@@ -1,0 +1,150 @@
+---
+title: Theming
+description: Design tokens, dark mode, and how to override styles without fighting specificity.
+icon: Palette
+---
+
+<include>../snippets/mock-banner.mdx</include>
+
+LetterStack has no opinion about colour. It has opinions about rhythm and measure, and it
+exposes both as CSS custom properties you are expected to overwrite.
+
+## Tokens
+
+Every token is a plain custom property on `:root`. There is no JavaScript theme object and
+nothing to import.
+
+```css title="app/globals.css"
+:root {
+  /* colour */
+  --ls-ink: oklch(0.22 0.01 265);
+  --ls-paper: oklch(0.99 0.002 265);
+  --ls-accent: oklch(0.58 0.19 265);
+  --ls-muted: oklch(0.52 0.01 265);
+  --ls-rule: oklch(0.91 0.005 265);
+
+  /* rhythm */
+  --ls-measure: 66ch;
+  --ls-leading: 1.65;
+  --ls-step: 0.375rem;
+
+  /* type */
+  --ls-font-prose: 'Charter', Georgia, serif;
+  --ls-font-ui: 'Inter', system-ui, sans-serif;
+}
+```
+
+<TypeTable
+  type={{
+    '--ls-measure': {
+      type: '<length>',
+      description: 'Line length for Prose. Prefer ch units so it survives font scaling.',
+      default: '66ch',
+    },
+    '--ls-leading': {
+      type: '<number>',
+      description: 'Base line height for body copy.',
+      default: '1.65',
+    },
+    '--ls-step': {
+      type: '<length>',
+      description: 'The vertical rhythm unit. Every margin is a multiple of this.',
+      default: '0.375rem',
+    },
+    '--ls-accent': {
+      type: '<color>',
+      description: 'Links, focus rings, and the subscribe button.',
+      default: 'oklch(0.58 0.19 265)',
+    },
+  }}
+/>
+
+## Dark mode
+
+Redefine the same tokens under whichever selector your app uses. LetterStack reads the
+properties, so it never needs to know which strategy you picked.
+
+```css tab="Class strategy" title="app/globals.css"
+.dark {
+  --ls-ink: oklch(0.93 0.005 265);
+  --ls-paper: oklch(0.17 0.01 265);
+  --ls-rule: oklch(0.28 0.01 265);
+}
+```
+
+```css tab="Media query" title="app/globals.css"
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ls-ink: oklch(0.93 0.005 265);
+    --ls-paper: oklch(0.17 0.01 265);
+    --ls-rule: oklch(0.28 0.01 265);
+  }
+}
+```
+
+```css tab="Data attribute" title="app/globals.css"
+[data-theme='dark'] {
+  --ls-ink: oklch(0.93 0.005 265);
+  --ls-paper: oklch(0.17 0.01 265);
+  --ls-rule: oklch(0.28 0.01 265);
+}
+```
+
+## Overriding a single component
+
+Each component takes `className` and forwards it to its outermost element. Class order
+decides the winner, so nothing needs `!important`.
+
+```tsx
+<Button className="rounded-none border-2 border-black shadow-[4px_4px_0_black]">
+  Brutalist
+</Button>
+```
+
+For a change you want everywhere, target the data attribute instead of the class name.
+Those attributes are part of the public API; the class names are not.
+
+```css
+[data-ls-button][data-variant='solid'] {
+  border-radius: 0;
+}
+```
+
+## The Tailwind preset
+
+Optional. It maps the tokens above onto Tailwind theme keys so `text-ink` and `max-w-measure`
+work in your own markup.
+
+```css title="app/globals.css"
+@import 'tailwindcss';
+@import '@letterstack/react/preset.css';
+```
+
+<Accordions type="single">
+  <Accordion title="Do I need Tailwind?">
+    No. The preset is a convenience for projects already using it. The components themselves
+    emit no utility classes.
+  </Accordion>
+  <Accordion title="Can I change the rhythm per page?">
+    Yes — set `--ls-step` on any ancestor. `Prose` and everything inside it read the nearest
+    definition, so a wide landing page and a narrow issue page can differ.
+  </Accordion>
+  <Accordion title="What about email rendering?">
+    `@letterstack/email` compiles a subset of these components to table-based HTML with
+    inlined styles. It is a separate package and shares the token names.
+  </Accordion>
+</Accordions>
+
+## Checking contrast
+
+The CLI reads your tokens and reports any pair that falls under WCAG AA.
+
+```npm
+npx letterstack check-contrast
+```
+
+```txt title="output"
+✓ ink on paper            14.2:1   AAA
+✓ accent on paper          5.1:1   AA
+✗ muted on paper           3.9:1   fails AA for body text
+```
