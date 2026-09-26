@@ -100,6 +100,25 @@ it. Worth remembering before chasing a type error that makes no sense.
 `typescript-eslint` does not support TypeScript 7.0, which `package.json` pins. Pre-existing.
 See `01-project.md`.
 
+### 8. A registry item can ship code that does not compile, silently
+
+`shadcn add <item>` copies the files an item lists and installs the dependencies it
+declares. Nothing checks that the two agree. An item importing `@/components/app-dialogs`
+while shipping no such file installs fine and then fails at build time in the consumer's
+app — and you will not see it, because your own repo has the file.
+
+`scripts/build-registry.mjs` derives every dependency from the real imports and fails on an
+`@/` import that no item ships. It caught exactly this for `app-dialogs.tsx` and
+`motion/range-slider.tsx`, and caught `@codemirror/view` and `@tiptap/core` being imported
+directly while only present as transitive installs.
+
+### 9. Fumadocs' build crashes are sometimes just crashes
+
+A `next build` failed with `Node.js process exited with exit code: 0xc0000409` and
+`spawn UNKNOWN` from `fumadocs-mdx`'s esbuild subprocess, across several MDX files at once.
+Nothing was wrong with the code — the identical build passed on the next run. Retry once
+before investigating.
+
 ---
 
 ## Decisions
@@ -135,6 +154,35 @@ and a `Library` separator above it. Both were removed: the nested separators add
 inside an already-indented list, and `Library` sat directly above a folder that already acts
 as its own heading, stacking two margins. Folders are the grouping; separators are only for
 runs of loose pages.
+
+### The editor palette is scoped, not global
+
+Covered in [06-editor.md](06-editor.md), repeated here because it is the thing most likely
+to be undone by someone tidying up: the editor's shadcn tokens live on `.letterstack-ui`,
+never `:root`. Promoting them repaints every documentation page, and makes the editor
+impossible to drop into an app that has its own shadcn theme.
+
+An earlier version of the port also added `@custom-variant dark (&:is(.dark *))`, copied
+from the source project. Fumadocs already defines `@variant dark (&:where(.dark, .dark *))`
+in its base.css, and the copied version does not match `.dark` itself — only descendants —
+so it would have broken dark mode on the root element. Removed.
+
+### The agent runs its loop in the browser
+
+Tools are declared to the AI SDK without an `execute`, so the SDK forwards calls to the
+client. Edits land in React state immediately and the document never round-trips. The cost
+is that the server cannot see the document, which is why a summary is rebuilt each turn.
+
+### Bring-your-own-key instead of a metered server key
+
+There is no account here and a shared key would mean paying for every visitor. The route
+still falls back to `GOOGLE_GENERATIVE_AI_API_KEY`, so a private deployment deletes one
+component and configures a key normally.
+
+### No image upload
+
+Uploading means choosing a storage provider, which is the host app's decision. A `data:`
+URL fallback would be worse than nothing — most email clients refuse to render one.
 
 ### `context/` is checked in
 

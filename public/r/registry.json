@@ -1,0 +1,526 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "letterstack",
+  "homepage": "https://github.com/EthanRodrigues001/letterstack-components",
+  "items": [
+    {
+      "name": "email-document",
+      "type": "registry:lib",
+      "title": "Email document model",
+      "description": "The data model every other piece reads and writes: block types, the document shape, and the pure helpers for adding, moving, duplicating and removing blocks. No React, no DOM.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "lib/email/document.ts",
+          "type": "registry:lib",
+          "target": "lib/email/document.ts"
+        }
+      ]
+    },
+    {
+      "name": "email-compiler",
+      "type": "registry:lib",
+      "title": "Email HTML compiler",
+      "description": "Turns an email document into table-based HTML with inlined styles that survives Outlook and Gmail. Includes the social icon set, container shadow helper and raw-HTML sanitiser.",
+      "dependencies": [],
+      "registryDependencies": [
+        "email-document"
+      ],
+      "files": [
+        {
+          "path": "lib/email/compiler.ts",
+          "type": "registry:lib",
+          "target": "lib/email/compiler.ts"
+        },
+        {
+          "path": "lib/email/shadow.ts",
+          "type": "registry:lib",
+          "target": "lib/email/shadow.ts"
+        },
+        {
+          "path": "lib/email/social.ts",
+          "type": "registry:lib",
+          "target": "lib/email/social.ts"
+        },
+        {
+          "path": "lib/email/normalize-raw-html.ts",
+          "type": "registry:lib",
+          "target": "lib/email/normalize-raw-html.ts"
+        },
+        {
+          "path": "lib/email/unsubscribe.ts",
+          "type": "registry:lib",
+          "target": "lib/email/unsubscribe.ts"
+        }
+      ]
+    },
+    {
+      "name": "email-templates",
+      "type": "registry:lib",
+      "title": "Starter templates",
+      "description": "Ready-made email documents to open the editor with.",
+      "dependencies": [],
+      "registryDependencies": [
+        "email-document"
+      ],
+      "files": [
+        {
+          "path": "lib/email/templates.ts",
+          "type": "registry:lib",
+          "target": "lib/email/templates.ts"
+        }
+      ]
+    },
+    {
+      "name": "editor-primitives",
+      "type": "registry:ui",
+      "title": "Editor primitives",
+      "description": "The three components the editor needs that shadcn/ui does not ship: a stacking-aware dialog, the imperative alert/confirm/prompt helpers, and the drag-to-set range slider used throughout the inspector.",
+      "dependencies": [
+        "@base-ui/react@1.8.0",
+        "lucide-react@1.47.0",
+        "motion@13.4.4"
+      ],
+      "registryDependencies": [
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "components/ui/coss-dialog.tsx",
+          "type": "registry:component",
+          "target": "components/ui/coss-dialog.tsx"
+        },
+        {
+          "path": "components/app-dialogs.tsx",
+          "type": "registry:component",
+          "target": "components/app-dialogs.tsx"
+        },
+        {
+          "path": "components/motion/range-slider.tsx",
+          "type": "registry:component",
+          "target": "components/motion/range-slider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-canvas",
+      "type": "registry:ui",
+      "title": "Email canvas",
+      "description": "The editable preview. Renders the document, handles selection, drag-and-drop reordering, drop indicators and column resizing.",
+      "dependencies": [
+        "@dnd-kit/core@6.3.1",
+        "@dnd-kit/sortable@10.0.0",
+        "@dnd-kit/utilities@3.2.2",
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10"
+      ],
+      "registryDependencies": [
+        "email-compiler",
+        "email-document"
+      ],
+      "files": [
+        {
+          "path": "components/editor/canvas-context.tsx",
+          "type": "registry:component",
+          "target": "components/editor/canvas-context.tsx"
+        },
+        {
+          "path": "components/editor/canvas-block.tsx",
+          "type": "registry:component",
+          "target": "components/editor/canvas-block.tsx"
+        },
+        {
+          "path": "components/editor/canvas-block-preview.tsx",
+          "type": "registry:component",
+          "target": "components/editor/canvas-block-preview.tsx"
+        },
+        {
+          "path": "components/editor/sortable-block-list.tsx",
+          "type": "registry:component",
+          "target": "components/editor/sortable-block-list.tsx"
+        },
+        {
+          "path": "components/editor/column-resizer.tsx",
+          "type": "registry:component",
+          "target": "components/editor/column-resizer.tsx"
+        },
+        {
+          "path": "components/editor/editor-types.ts",
+          "type": "registry:component",
+          "target": "components/editor/editor-types.ts"
+        }
+      ]
+    },
+    {
+      "name": "block-palette",
+      "type": "registry:ui",
+      "title": "Block palette",
+      "description": "The blocks bar: every insertable block as a draggable tile. Primitives are separated from composite starting layouts on purpose.",
+      "dependencies": [
+        "@dnd-kit/core@6.3.1",
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10"
+      ],
+      "registryDependencies": [
+        "email-document",
+        "separator"
+      ],
+      "files": [
+        {
+          "path": "components/editor/block-palette.tsx",
+          "type": "registry:component",
+          "target": "components/editor/block-palette.tsx"
+        },
+        {
+          "path": "components/editor/editor-types.ts",
+          "type": "registry:component",
+          "target": "components/editor/editor-types.ts"
+        }
+      ]
+    },
+    {
+      "name": "block-inspector",
+      "type": "registry:ui",
+      "title": "Block inspector",
+      "description": "The right-hand properties panel. One editor per block type, plus the shared field controls for spacing, colour, alignment, links and social rows.",
+      "dependencies": [
+        "@codemirror/lang-html@6.4.12",
+        "@codemirror/view@6.43.13",
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10",
+        "@uiw/react-codemirror@4.25.12",
+        "lucide-react@1.47.0"
+      ],
+      "registryDependencies": [
+        "accordion",
+        "badge",
+        "button",
+        "editor-primitives",
+        "email-compiler",
+        "email-document",
+        "field",
+        "input",
+        "scroll-area",
+        "select",
+        "separator",
+        "textarea",
+        "toggle-group",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "components/editor/block-inspector.tsx",
+          "type": "registry:component",
+          "target": "components/editor/block-inspector.tsx"
+        },
+        {
+          "path": "components/editor/inspector-controls.tsx",
+          "type": "registry:component",
+          "target": "components/editor/inspector-controls.tsx"
+        },
+        {
+          "path": "components/editor/image-upload-input.tsx",
+          "type": "registry:component",
+          "target": "components/editor/image-upload-input.tsx"
+        },
+        {
+          "path": "components/editor/social-links-field.tsx",
+          "type": "registry:component",
+          "target": "components/editor/social-links-field.tsx"
+        },
+        {
+          "path": "components/editor/html-code-field.tsx",
+          "type": "registry:component",
+          "target": "components/editor/html-code-field.tsx"
+        }
+      ]
+    },
+    {
+      "name": "rich-text-editor",
+      "type": "registry:ui",
+      "title": "Rich text editor",
+      "description": "Tiptap editor tuned for email: only the marks that survive email clients, a slash command menu, and a selection bubble menu.",
+      "dependencies": [
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10",
+        "@tiptap/core@3.31.3",
+        "@tiptap/extension-color@3.31.3",
+        "@tiptap/extension-highlight@3.31.3",
+        "@tiptap/extension-link@3.31.3",
+        "@tiptap/extension-text-align@3.31.3",
+        "@tiptap/extension-text-style@3.31.3",
+        "@tiptap/extension-underline@3.31.3",
+        "@tiptap/react@3.31.3",
+        "@tiptap/starter-kit@3.31.3",
+        "@tiptap/suggestion@3.31.3"
+      ],
+      "registryDependencies": [
+        "email-document"
+      ],
+      "files": [
+        {
+          "path": "components/editor/rich-text-editor.tsx",
+          "type": "registry:component",
+          "target": "components/editor/rich-text-editor.tsx"
+        },
+        {
+          "path": "components/editor/slash-command-extension.ts",
+          "type": "registry:component",
+          "target": "components/editor/slash-command-extension.ts"
+        },
+        {
+          "path": "components/editor/block-bubble-menu.tsx",
+          "type": "registry:component",
+          "target": "components/editor/block-bubble-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "formatting-toolbar",
+      "type": "registry:ui",
+      "title": "Formatting toolbar",
+      "description": "The contextual toolbar above the canvas — font, size, colour, alignment and link controls for the current selection.",
+      "dependencies": [
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10",
+        "@tiptap/react@3.31.3"
+      ],
+      "registryDependencies": [
+        "button",
+        "editor-primitives",
+        "field",
+        "input",
+        "select",
+        "separator"
+      ],
+      "files": [
+        {
+          "path": "components/editor/formatting-toolbar.tsx",
+          "type": "registry:component",
+          "target": "components/editor/formatting-toolbar.tsx"
+        },
+        {
+          "path": "components/editor/formatting-options.ts",
+          "type": "registry:component",
+          "target": "components/editor/formatting-options.ts"
+        },
+        {
+          "path": "components/editor/editor-toolbar-context.tsx",
+          "type": "registry:component",
+          "target": "components/editor/editor-toolbar-context.tsx"
+        }
+      ]
+    },
+    {
+      "name": "styles-panel",
+      "type": "registry:ui",
+      "title": "Styles panel",
+      "description": "Document-level theme: page and content colour, width, font, radius and spacing, with presets. Values live on the document and are written as inline styles at compile time, so nothing leaks into the host app.",
+      "dependencies": [],
+      "registryDependencies": [
+        "accordion",
+        "editor-primitives",
+        "email-document",
+        "field",
+        "input",
+        "select"
+      ],
+      "files": [
+        {
+          "path": "components/editor/styles-panel.tsx",
+          "type": "registry:component",
+          "target": "components/editor/styles-panel.tsx"
+        },
+        {
+          "path": "lib/email/theme-presets.json",
+          "type": "registry:lib",
+          "target": "lib/email/theme-presets.json"
+        }
+      ]
+    },
+    {
+      "name": "editor-panels",
+      "type": "registry:ui",
+      "title": "Editor side panels",
+      "description": "The remaining left-rail panels: section outline, deliverability checks, panel chrome, settings sheet and the preview dialog.",
+      "dependencies": [
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "editor-primitives",
+        "email-document",
+        "field",
+        "input",
+        "scroll-area",
+        "sheet",
+        "tabs",
+        "textarea",
+        "toggle-group"
+      ],
+      "files": [
+        {
+          "path": "components/editor/side-panel.tsx",
+          "type": "registry:component",
+          "target": "components/editor/side-panel.tsx"
+        },
+        {
+          "path": "components/editor/sections-panel.tsx",
+          "type": "registry:component",
+          "target": "components/editor/sections-panel.tsx"
+        },
+        {
+          "path": "components/editor/optimize-panel.tsx",
+          "type": "registry:component",
+          "target": "components/editor/optimize-panel.tsx"
+        },
+        {
+          "path": "components/editor/settings-sheet.tsx",
+          "type": "registry:component",
+          "target": "components/editor/settings-sheet.tsx"
+        },
+        {
+          "path": "components/editor/preview-dialog.tsx",
+          "type": "registry:component",
+          "target": "components/editor/preview-dialog.tsx"
+        },
+        {
+          "path": "components/editor/preview-html.ts",
+          "type": "registry:component",
+          "target": "components/editor/preview-html.ts"
+        },
+        {
+          "path": "components/editor/nav-button.tsx",
+          "type": "registry:component",
+          "target": "components/editor/nav-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-editor",
+      "type": "registry:block",
+      "title": "Email editor",
+      "description": "The whole editor: canvas, blocks bar, inspector, formatting toolbar, styles, undo/redo, autosave, HTML and preview views. Drop it in with an initial document and a save handler.",
+      "dependencies": [
+        "@dnd-kit/core@6.3.1",
+        "@dnd-kit/sortable@10.0.0",
+        "@hugeicons/core-free-icons@4.3.5",
+        "@hugeicons/react@1.1.10",
+        "lucide-react@1.47.0"
+      ],
+      "registryDependencies": [
+        "block-inspector",
+        "block-palette",
+        "button",
+        "dropdown-menu",
+        "editor-panels",
+        "editor-primitives",
+        "email-canvas",
+        "email-compiler",
+        "email-document",
+        "field",
+        "formatting-toolbar",
+        "input",
+        "rich-text-editor",
+        "scroll-area",
+        "separator",
+        "sidebar",
+        "spinner",
+        "styles-panel",
+        "textarea"
+      ],
+      "files": [
+        {
+          "path": "components/editor/editor-shell.tsx",
+          "type": "registry:component",
+          "target": "components/editor/editor-shell.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-editor-agent",
+      "type": "registry:block",
+      "title": "Email editor assistant",
+      "description": "The agentic panel. Tools run in the browser against the document so edits land instantly; the route makes one model call per step. Mounts through the editor’s renderAssistant slot. Ships a bring-your-own-key field — delete it and set GOOGLE_GENERATIVE_AI_API_KEY to use a server key.",
+      "dependencies": [
+        "@ai-sdk/google@4.0.82",
+        "@ai-sdk/react@4.0.119",
+        "@lexical/react@0.51.0",
+        "ai@7.0.116",
+        "lexical@0.51.0",
+        "lucide-react@1.47.0",
+        "zod@4.6.5"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "email-compiler",
+        "email-document",
+        "email-editor",
+        "scroll-area",
+        "styles-panel"
+      ],
+      "files": [
+        {
+          "path": "components/editor/agent/agent-panel.tsx",
+          "type": "registry:component",
+          "target": "components/editor/agent/agent-panel.tsx"
+        },
+        {
+          "path": "components/editor/agent/agent-composer.tsx",
+          "type": "registry:component",
+          "target": "components/editor/agent/agent-composer.tsx"
+        },
+        {
+          "path": "components/editor/agent/mention-node.ts",
+          "type": "registry:component",
+          "target": "components/editor/agent/mention-node.ts"
+        },
+        {
+          "path": "components/editor/agent/api-key-field.tsx",
+          "type": "registry:component",
+          "target": "components/editor/agent/api-key-field.tsx"
+        },
+        {
+          "path": "lib/agent/use-agent.ts",
+          "type": "registry:lib",
+          "target": "lib/agent/use-agent.ts"
+        },
+        {
+          "path": "lib/agent/tools.ts",
+          "type": "registry:lib",
+          "target": "lib/agent/tools.ts"
+        },
+        {
+          "path": "lib/agent/context.ts",
+          "type": "registry:lib",
+          "target": "lib/agent/context.ts"
+        },
+        {
+          "path": "lib/agent/commands.ts",
+          "type": "registry:lib",
+          "target": "lib/agent/commands.ts"
+        },
+        {
+          "path": "lib/agent/models.ts",
+          "type": "registry:lib",
+          "target": "lib/agent/models.ts"
+        },
+        {
+          "path": "lib/agent/api-key.ts",
+          "type": "registry:lib",
+          "target": "lib/agent/api-key.ts"
+        },
+        {
+          "path": "app/api/agent/chat/route.ts",
+          "type": "registry:page",
+          "target": "app/api/agent/chat/route.ts"
+        }
+      ]
+    }
+  ]
+}

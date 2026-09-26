@@ -2,16 +2,18 @@
 
 ## What this is
 
-A documentation site built with [Fumadocs](https://fumadocs.dev) for **LetterStack**, a
-fictional React component library for newsletters and editorial layouts.
+Two things, in one repo.
 
-**The library does not exist.** Every prop table, version number, changelog entry and
-migration note is invented. The point of the repo is a working Fumadocs site with realistic
-content shape — so the navigation, search, MDX pipeline and layout can be evaluated against
-something that looks like real documentation instead of lorem ipsum.
+**1. The email editor — the real product.** A block-based email editor ported out of the
+LetterStack email SaaS and published as a shadcn registry, so it can be installed whole or
+in parts. Lives in `components/editor`, `lib/email` and `lib/agent`; surfaced at `/editor`
+and `/lab`. See [06-editor.md](06-editor.md).
 
-If you are here to add real content, the mock pages are safe to delete; the wiring in
-`lib/`, `app/` and `scripts/` is the part worth keeping.
+**2. A Fumadocs documentation site**, which came first and currently documents a *fictional*
+newsletter component library. Every prop table, version number and changelog entry under
+`content/docs` is invented. It is scaffolding waiting to be replaced with real
+documentation for the editor — safe to delete when that happens. The wiring in `lib/source.ts`,
+`app/docs` and `scripts/check-icons.mjs` is the part worth keeping.
 
 ## Stack
 
@@ -24,6 +26,10 @@ If you are here to add real content, the mock pages are safe to delete; the wiri
 | Tailwind | 4.3 | via `@tailwindcss/postcss` |
 | TypeScript | 7.0 | see the ESLint caveat below |
 | Icons | `lucide-react` 1.47 | resolved by name at page-tree build time |
+| Editor | Tiptap 3 | restricted to marks that survive email clients |
+| Drag and drop | dnd-kit | canvas reordering and the blocks bar |
+| Editor UI | shadcn/ui on Base UI + Radix | scoped to `.letterstack-ui` |
+| Assistant | AI SDK 7 + `@ai-sdk/google` | tools run in the browser, not on the server |
 
 ## Commands
 
@@ -33,14 +39,18 @@ npm run build         # production build
 npm run start         # serve the production build
 npm run types:check   # next typegen && tsc --noEmit
 npm run check:icons   # validate every icon name in content/docs
+npm run registry:build # regenerate registry.json and public/r/*.json
 npm run lint          # BROKEN - see below
 ```
 
 ## Current status
 
-Builds clean: 87 routes, 24 doc pages, no warnings.
+Builds clean, no warnings.
 
-- `/` — marketing-ish landing page
+- `/` — landing page
+- `/editor` — the editor
+- `/lab` — the editor plus the agentic assistant
+- `/api/agent/chat` — one model call per agent step
 - `/docs` — 307 redirect to `/docs/v2`
 - `/docs/v2/**` — the current version, 18 pages
 - `/docs/v1/**` — a legacy version, 6 pages, reachable from the sidebar dropdown

@@ -9,6 +9,11 @@ app/
   (home)/
     layout.tsx                HomeLayout
     page.tsx                  landing page
+  (editor)/
+    layout.tsx                puts `.letterstack-ui` on a wrapper + mounts <AppDialogs />
+    editor/page.tsx           the editor
+    lab/page.tsx              the editor + the agentic assistant
+  api/agent/chat/route.ts     one model call per agent step, streamed back
   docs/
     layout.tsx                GlassLayout, receives the page tree
     [[...slug]]/page.tsx      the doc page shell (title, description, MDX body)
@@ -20,8 +25,15 @@ app/
 
 components/
   mdx.tsx                     the MDX component registry
+  editor/                     the email editor — see 06-editor.md
+  ui/                         shadcn primitives the editor needs
+  app-dialogs.tsx             imperative alert/confirm/prompt
+  motion/range-slider.tsx
 
 lib/
+  email/                      document model + HTML compiler — see 06-editor.md
+  agent/                      the assistant's loop, tools and model registry
+  utils.ts                    cn()
   source.ts                   the content collection + MDX plugin config + loader
   shared.ts                   app name, route constants, git config, baseUrl, url helpers
   layout.shared.tsx           nav title, header links, GitHub link
@@ -29,9 +41,13 @@ lib/
 
 scripts/
   check-icons.mjs             validates every icon name in content/docs
+  build-registry.mjs          generates registry.json from real imports
 
 content/docs/                 all documentation content (see 03-page-conventions.md)
 context/                      this folder
+registry.json                 generated — do not hand-edit
+public/r/*.json               the served registry, written by `shadcn build`
+components.json               shadcn config
 next.config.mjs               MDX plugin, /docs redirect, Takumi external package
 proxy.ts                      Next middleware
 ```
@@ -122,9 +138,15 @@ Three things follow from that choice:
   `layouts/glass/slots/header.js`. This differs from the default docs layout, and from
   fumadocs.dev's own site, where search sits above the sidebar.
 
-## The two CSS fixes in global.css
+## global.css
 
-Both work around glass sidebar spacing. Each is commented in place.
+Three separate theming systems share that file and are deliberately kept apart — Fumadocs'
+`--color-fd-*`, the editor's shadcn palette scoped to `.letterstack-ui`, and the email
+theme which only ever exists as inline styles. [06-editor.md](06-editor.md) explains why,
+and the file itself carries the same note at the top. **Do not promote the editor palette
+to `:root`.**
+
+Below that are two fixes for glass sidebar spacing. Each is commented in place.
 
 1. **Nested folder rail.** Glass renders folder children with no indent, so a nested page
    sits flush with its folder. The rule adds a left margin, border and padding to the
