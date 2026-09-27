@@ -23,12 +23,10 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Cancel01Icon,
   Copy01Icon,
-  DoorOpenIcon,
   Download01Icon,
   LayoutTwoColumnIcon,
   PaintBrush01Icon,
 } from "@hugeicons/core-free-icons"
-import { useRouter } from "next/navigation"
 
 import { alertDialog } from "@/components/app-dialogs"
 import { BlockInspector } from "@/components/editor/block-inspector"
@@ -56,7 +54,6 @@ import {
   Field,
   FieldGroup,
   FieldLabel,
-  FieldTitle,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -75,7 +72,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
@@ -182,11 +178,10 @@ export function EditorShell({
     selectedBlockId: string
   }) => React.ReactNode
 } = {}) {
-  const router = useRouter()
   const [document, setDocument] =
     React.useState<EmailDocument>(() => initialDocument ?? initialEmailDocument)
   const [selectedBlockId, setSelectedBlockId] = React.useState<string>("")
-  const [rightPanel, setRightPanel] = React.useState<"block" | "theme" | "settings" | null>(null)
+  const [rightPanel, setRightPanel] = React.useState<"block" | "theme" | null>(null)
   const [activeDrag, setActiveDrag] = React.useState<ActiveDrag | null>(null)
   const [insertTarget, setInsertTarget] = React.useState<InsertTarget | null>(null)
   const [dockStatus, setDockStatus] = React.useState<DockStatus>("idle")
@@ -201,8 +196,7 @@ export function EditorShell({
   const selectedBlock = findBlock(document.blocks, selectedBlockId)
   const selectedLocation = locateBlock(document.blocks, selectedBlockId)
   const selectedIndex = selectedLocation?.index ?? -1
-  const inspectorOpen =
-    rightPanel === "theme" || rightPanel === "settings" || Boolean(selectedBlock)
+  const inspectorOpen = rightPanel === "theme" || Boolean(selectedBlock)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -475,15 +469,6 @@ export function EditorShell({
     [updateDocument]
   )
 
-  const saveAndExit = React.useCallback(async () => {
-    await saveDocument()
-    if (onExit) {
-      onExit()
-    } else {
-      router.push("/")
-    }
-  }, [saveDocument, onExit, router])
-
   const addBlock = React.useCallback(
     (type: EmailBlock["type"]) => {
       const block = createBlock(type)
@@ -668,14 +653,13 @@ export function EditorShell({
         <EditorHeader
           documentName={document.name}
           onRename={renameDocument}
-          onExit={onExit ?? (() => router.push("/"))}
+          onExit={onExit}
           onSave={() => void saveDocument()}
           canUndo={canUndo}
           canRedo={canRedo}
           onUndo={undo}
           onRedo={redo}
           status={dockStatus}
-          onSaveAndExit={() => void saveAndExit()}
           onDownloadJson={downloadJson}
           onCopyJson={() => void copyTemplateJson()}
           onPasteJson={() => setPasteOpen(true)}
@@ -719,10 +703,6 @@ export function EditorShell({
                   setSelectedBlockId("")
                   setRightPanel("theme")
                 }}
-                onOpenSettings={() => {
-                  setSelectedBlockId("")
-                  setRightPanel("settings")
-                }}
                 assistant={renderAssistant?.({
                   document,
                   updateDocument,
@@ -758,11 +738,6 @@ export function EditorShell({
                 <aside className="absolute right-4 top-4 bottom-4 z-20 flex w-[328px] flex-col overflow-hidden rounded-xl border bg-card shadow-2xl">
                   {rightPanel === "theme" ? (
                     <StylesPanel
-                      document={document}
-                      onUpdateDocument={updateDocument}
-                    />
-                  ) : rightPanel === "settings" ? (
-                    <CampaignSettingsPanel
                       document={document}
                       onUpdateDocument={updateDocument}
                     />
@@ -870,7 +845,6 @@ function EditorHeader({
   onUndo,
   onRedo,
   status,
-  onSaveAndExit,
   onDownloadJson,
   onCopyJson,
   onPasteJson,
@@ -888,7 +862,6 @@ function EditorHeader({
   onUndo?: () => void
   onRedo?: () => void
   status: DockStatus
-  onSaveAndExit: () => void
   onDownloadJson: () => void
   onCopyJson: () => void
   onPasteJson: () => void
@@ -904,17 +877,19 @@ function EditorHeader({
   ] as const
   return (
     <header className="flex h-12 shrink-0 items-center justify-between bg-background px-4">
-      {/* Left: Back chevron + Title */}
+      {/* Left: Back chevron (only when the host gives us somewhere to go) + Title */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={onExit}
-          className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          type="button"
-          title="Leave the editor"
-          aria-label="Leave the editor"
-        >
-          <ChevronLeftIcon className="size-4" />
-        </button>
+        {onExit && (
+          <button
+            onClick={onExit}
+            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            type="button"
+            title="Leave the editor"
+            aria-label="Leave the editor"
+          >
+            <ChevronLeftIcon className="size-4" />
+          </button>
+        )}
         <HeaderTitle name={documentName} onRename={onRename} />
       </div>
 
@@ -1063,11 +1038,6 @@ function EditorHeader({
                 <HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-4 mr-2" />
                 Download JSON
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onSaveAndExit}>
-                <HugeiconsIcon icon={DoorOpenIcon} strokeWidth={2} className="size-4 mr-2" />
-                Save and exit
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -1184,9 +1154,6 @@ function EditorLeftSidebar({
 }: {
   onAddBlock: (type: EmailBlock["type"]) => void
   onOpenTheme: () => void
-  // onOpenSettings kept off the params while the Campaign settings button is
-  // commented out below; re-add it here (and in the caller) to restore.
-  onOpenSettings?: () => void
   /** Rendered as a second tab when the host route provides one (/studio). */
   assistant?: React.ReactNode
 }) {
@@ -1244,19 +1211,6 @@ function EditorLeftSidebar({
             />
             Edit theme
           </Button>
-          {/* Campaign settings — hidden for now (not useful in the editor sidebar).
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10"
-            title="Campaign settings"
-            aria-label="Campaign settings"
-            onClick={onOpenSettings}
-          >
-            <HugeiconsIcon icon={Settings02Icon} strokeWidth={2} />
-          </Button>
-          */}
         </div>
       </SidebarFooter>
     </Sidebar>
@@ -1360,96 +1314,6 @@ function DraggableBlockTile({
     >
       {children}
     </button>
-  )
-}
-
-function CampaignSettingsPanel({
-  document,
-  onUpdateDocument,
-}: {
-  document: EmailDocument
-  onUpdateDocument: (updater: (current: EmailDocument) => EmailDocument) => void
-}) {
-  return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="border-b px-4 py-3">
-        <p className="text-sm font-semibold">Settings</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Campaign details and sender information
-        </p>
-      </div>
-      <ScrollArea className="min-h-0 flex-1">
-        <CampaignSettings
-          document={document}
-          onUpdateDocument={onUpdateDocument}
-        />
-      </ScrollArea>
-    </div>
-  )
-}
-
-function CampaignSettings({
-  document,
-  onUpdateDocument,
-}: {
-  document: EmailDocument
-  onUpdateDocument: (updater: (current: EmailDocument) => EmailDocument) => void
-}) {
-  return (
-    <FieldGroup className="p-3">
-      <Field>
-        <FieldTitle>Campaign settings</FieldTitle>
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-doc-name">Campaign name</FieldLabel>
-        <Input
-          id="new-doc-name"
-          value={document.name}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, name: event.target.value })
-            )
-          }
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-subject">Subject line</FieldLabel>
-        <Input
-          id="new-subject"
-          value={document.subject}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, subject: event.target.value })
-            )
-          }
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-from-name">From name</FieldLabel>
-        <Input
-          id="new-from-name"
-          value={document.fromName}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, fromName: event.target.value })
-            )
-          }
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-from-email">From email</FieldLabel>
-        <Input
-          id="new-from-email"
-          type="email"
-          value={document.fromEmail}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, fromEmail: event.target.value })
-            )
-          }
-        />
-      </Field>
-    </FieldGroup>
   )
 }
 
