@@ -78,6 +78,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import {
   MoreHorizontalIcon,
   Redo2Icon,
@@ -664,7 +665,10 @@ export function EditorShell({
     [document, insertTarget, selectedBlockId, updateDocument]
   )
 
+  // The inspector uses tooltips, so the shell brings its own provider instead
+  // of relying on the host app to have one mounted.
   return (
+    <TooltipProvider>
     <EditorToolbarProvider>
       <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
         <EditorHeader
@@ -898,6 +902,7 @@ export function EditorShell({
         </div>
       </div>
     </EditorToolbarProvider>
+    </TooltipProvider>
   )
 }
 
