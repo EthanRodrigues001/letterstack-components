@@ -5,17 +5,14 @@ import {
   ArrowDown01Icon,
   ArrowLeft01Icon,
   ArrowUp01Icon,
+  BorderNone01Icon,
+  DashedLine01Icon,
+  EllipsisIcon,
+  MinusSignIcon,
   TextAlignCenterIcon,
   TextAlignLeftIcon,
   TextAlignRightIcon,
 } from "@hugeicons/core-free-icons";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -35,7 +32,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HtmlCodeField } from "./html-code-field";
-import { OptionToggle, SliderField } from "./inspector-controls";
+import {
+  ColorField,
+  InspectorSection,
+  OptionToggle,
+  SliderField,
+} from "./inspector-controls";
 import {
   createColumn,
   updateBlock,
@@ -85,13 +87,17 @@ export function BlockInspector({
 
   return (
     <>
-      {/* Header */}
-      <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
+      {/* Header — the same three operations as before (back to blocks, move
+          up, move down). The block name is plain text rather than a Badge
+          pill, and everything sits on the panel's 11px / 24px icon scale so
+          the bar reads as part of the sections below it, not a title bar. */}
+      <div className="flex h-8 shrink-0 items-center gap-0.5 bg-secondary px-2">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon-sm"
+              className="size-6 rounded-md [&_svg]:size-3.5"
               onClick={onBack}
               aria-label="Back to blocks"
             >
@@ -100,16 +106,17 @@ export function BlockInspector({
           </TooltipTrigger>
           <TooltipContent>Back to blocks</TooltipContent>
         </Tooltip>
-        <div className="mx-0.5 h-3 w-px bg-border" />
-        <Badge variant="secondary" className="text-[10px]">
+        <span aria-hidden className="mx-1 h-3.5 w-px shrink-0 bg-border/70" />
+        <span className="truncate text-xs font-medium text-muted-foreground">
           {BLOCK_LABELS[block.type]}
-        </Badge>
+        </span>
         <div className="ml-auto flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon-sm"
+                className="size-6 rounded-md [&_svg]:size-3.5"
                 onClick={onMoveUp}
                 aria-label="Move block up"
               >
@@ -123,6 +130,7 @@ export function BlockInspector({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                className="size-6 rounded-md [&_svg]:size-3.5"
                 onClick={onMoveDown}
                 aria-label="Move block down"
               >
@@ -134,118 +142,88 @@ export function BlockInspector({
         </div>
       </div>
 
-      <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-scrollbar]]:hidden">
+      {/* The body is a card lifted onto the secondary bar above it, so the
+          header reads as the surface the panel sits on rather than a strip
+          glued to the top of it. */}
+      <ScrollArea className="min-h-0 flex-1 rounded-t-xl bg-card [&_[data-slot=scroll-area-scrollbar]]:hidden">
         {/* One section open at a time (like the theme editor); the block's own
             content section starts open. */}
-        <Accordion type="single" collapsible defaultValue="content" className="w-full">
-          <AccordionItem value="content">
-            <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-              {BLOCK_LABELS[block.type]}
-            </AccordionTrigger>
-            <AccordionContent className="h-auto px-4 pb-4">
-              <FieldGroup>
-                {block.type === "text"        && <TextBlockFields        block={block} onChange={setBlock} />}
-                {block.type === "heading"     && <HeadingBlockFields     block={block} onChange={setBlock} />}
-                {block.type === "paragraph"   && <ParagraphBlockFields   block={block} onChange={setBlock} />}
-                {block.type === "image"       && <ImageBlockFields       block={block} onChange={setBlock} />}
-                {block.type === "button"      && <ButtonBlockFields      block={block} onChange={setBlock} />}
-                {block.type === "columns"     && <ColumnsBlockFields     block={block} onChange={setBlock} />}
-                {block.type === "articleCard" && <ArticleCardBlockFields block={block} onChange={setBlock} />}
-                {block.type === "spacer"      && <SpacerBlockFields      block={block} onChange={setBlock} />}
-                {block.type === "rawHtml"     && <RawHtmlBlockFields     block={block} onChange={setBlock} />}
-                {block.type === "video"       && <VideoBlockFields       block={block} onChange={setBlock} />}
-                {block.type === "social"      && <SocialBlockFields      block={block} onChange={setBlock} />}
-                {block.type === "logo"        && <LogoBlockFields        block={block} onChange={setBlock} />}
-                {block.type === "footer"      && <FooterBlockFields      block={block} onChange={setBlock} />}
-                {block.type === "divider" && (
-                  <Field>
-                    <FieldDescription>Renders as a 1px horizontal rule.</FieldDescription>
-                  </Field>
+        {/* Flat, always-open sections rather than an accordion: every
+            control stays visible, the way a design tool inspector reads. */}
+        <InspectorSection title={BLOCK_LABELS[block.type]}>
+          <FieldGroup>
+            {block.type === "text"        && <TextBlockFields        block={block} onChange={setBlock} />}
+            {block.type === "heading"     && <HeadingBlockFields     block={block} onChange={setBlock} />}
+            {block.type === "paragraph"   && <ParagraphBlockFields   block={block} onChange={setBlock} />}
+            {block.type === "image"       && <ImageBlockFields       block={block} onChange={setBlock} />}
+            {block.type === "button"      && <ButtonBlockFields      block={block} onChange={setBlock} />}
+            {block.type === "columns"     && <ColumnsBlockFields     block={block} onChange={setBlock} />}
+            {block.type === "articleCard" && <ArticleCardBlockFields block={block} onChange={setBlock} />}
+            {block.type === "spacer"      && <SpacerBlockFields      block={block} onChange={setBlock} />}
+            {block.type === "rawHtml"     && <RawHtmlBlockFields     block={block} onChange={setBlock} />}
+            {block.type === "video"       && <VideoBlockFields       block={block} onChange={setBlock} />}
+            {block.type === "social"      && <SocialBlockFields      block={block} onChange={setBlock} />}
+            {block.type === "logo"        && <LogoBlockFields        block={block} onChange={setBlock} />}
+            {block.type === "footer"      && <FooterBlockFields      block={block} onChange={setBlock} />}
+            {block.type === "divider" && (
+              <Field>
+                <FieldDescription>Renders as a 1px horizontal rule.</FieldDescription>
+              </Field>
+            )}
+          </FieldGroup>
+        </InspectorSection>
+
+        <InspectorSection title="Block styling">
+          <FieldGroup>
+            <Field>
+              <FieldLabel>Background</FieldLabel>
+              <div className="flex items-center gap-2">
+                <ColorField
+                  value={block.backgroundColor}
+                  onChange={(v) => setBlock((b) => ({ ...b, backgroundColor: v }))}
+                />
+                {block.backgroundColor && (
+                  <Button
+                    variant="ghost" size="sm" className="h-7 shrink-0 px-1.5 text-[11px] font-medium text-muted-foreground"
+                    onClick={() => setBlock((b) => ({ ...b, backgroundColor: undefined }))}
+                  >
+                    Clear
+                  </Button>
                 )}
-              </FieldGroup>
-            </AccordionContent>
-          </AccordionItem>
+              </div>
+            </Field>
 
-          <AccordionItem value="styling">
-            <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-              Block styling
-            </AccordionTrigger>
-            <AccordionContent className="h-auto px-4 pb-4">
-              <FieldGroup>
-                <Field>
-                  <FieldLabel>Background</FieldLabel>
-                  <div className="flex items-center gap-2">
-                    <div className="grid flex-1 grid-cols-[28px_1fr] items-center gap-2">
-                      <input
-                        type="color"
-                        value={block.backgroundColor ?? "#ffffff"}
-                        onChange={(e) => setBlock((b) => ({ ...b, backgroundColor: e.target.value }))}
-                        className="h-7 w-7 cursor-pointer rounded border p-0.5"
-                      />
-                      <Input
-                        value={block.backgroundColor ?? ""}
-                        placeholder="Transparent"
-                        onChange={(e) =>
-                          setBlock((b) => ({ ...b, backgroundColor: e.target.value || undefined }))
-                        }
-                        className="h-7 font-mono text-xs"
-                      />
-                    </div>
-                    {block.backgroundColor && (
-                      <Button
-                        variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs"
-                        onClick={() => setBlock((b) => ({ ...b, backgroundColor: undefined }))}
-                      >
-                        Clear
-                      </Button>
-                    )}
-                  </div>
-                </Field>
-
-                <Field>
-                  <FieldLabel>Text color</FieldLabel>
-                  <div className="flex items-center gap-2">
-                    <div className="grid flex-1 grid-cols-[28px_1fr] items-center gap-2">
-                      <input
-                        type="color"
-                        value={block.textColor ?? document.settings.textColor}
-                        onChange={(e) => setBlock((b) => ({ ...b, textColor: e.target.value }))}
-                        className="h-7 w-7 cursor-pointer rounded border p-0.5"
-                      />
-                      <Input
-                        value={block.textColor ?? ""}
-                        placeholder="Default"
-                        onChange={(e) =>
-                          setBlock((b) => ({ ...b, textColor: e.target.value || undefined }))
-                        }
-                        className="h-7 font-mono text-xs"
-                      />
-                    </div>
-                    {block.textColor && (
-                      <Button
-                        variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs"
-                        onClick={() => setBlock((b) => ({ ...b, textColor: undefined }))}
-                      >
-                        Clear
-                      </Button>
-                    )}
-                  </div>
-                </Field>
-
-                <SliderField
-                  label="Padding top" value={block.paddingTop ?? 0}
-                  min={0} max={80} step={4} suffix="px"
-                  onChange={(v) => setBlock((b) => ({ ...b, paddingTop: v || undefined }))}
+            <Field>
+              <FieldLabel>Text color</FieldLabel>
+              <div className="flex items-center gap-2">
+                <ColorField
+                  value={block.textColor}
+                  fallback={document.settings.textColor}
+                  onChange={(v) => setBlock((b) => ({ ...b, textColor: v }))}
                 />
-                <SliderField
-                  label="Padding bottom" value={block.paddingBottom ?? 0}
-                  min={0} max={80} step={4} suffix="px"
-                  onChange={(v) => setBlock((b) => ({ ...b, paddingBottom: v || undefined }))}
-                />
-              </FieldGroup>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+                {block.textColor && (
+                  <Button
+                    variant="ghost" size="sm" className="h-7 shrink-0 px-1.5 text-[11px] font-medium text-muted-foreground"
+                    onClick={() => setBlock((b) => ({ ...b, textColor: undefined }))}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </Field>
+
+            <SliderField
+              label="Padding top" value={block.paddingTop ?? 0}
+              min={0} max={80} step={4} suffix="px"
+              onChange={(v) => setBlock((b) => ({ ...b, paddingTop: v || undefined }))}
+            />
+            <SliderField
+              label="Padding bottom" value={block.paddingBottom ?? 0}
+              min={0} max={80} step={4} suffix="px"
+              onChange={(v) => setBlock((b) => ({ ...b, paddingBottom: v || undefined }))}
+            />
+          </FieldGroup>
+        </InspectorSection>
       </ScrollArea>
     </>
   );
@@ -627,23 +605,13 @@ function ColumnsBlockFields({
       <Field>
         <FieldLabel>Column background</FieldLabel>
         <div className="flex items-center gap-2">
-          <div className="grid flex-1 grid-cols-[28px_1fr] items-center gap-2">
-            <input
-              type="color"
-              value={block.columnBackgroundColor ?? "#ffffff"}
-              onChange={(e) => set({ columnBackgroundColor: e.target.value })}
-              className="h-7 w-7 cursor-pointer rounded border p-0.5"
-            />
-            <Input
-              value={block.columnBackgroundColor ?? ""}
-              placeholder="Transparent"
-              onChange={(e) => set({ columnBackgroundColor: e.target.value || undefined })}
-              className="h-7 font-mono text-xs"
-            />
-          </div>
+          <ColorField
+            value={block.columnBackgroundColor}
+            onChange={(v) => set({ columnBackgroundColor: v })}
+          />
           {block.columnBackgroundColor && (
             <Button
-              variant="ghost" size="sm" className="h-7 shrink-0 px-2 text-xs"
+              variant="ghost" size="sm" className="h-7 shrink-0 px-1.5 text-[11px] font-medium text-muted-foreground"
               onClick={() => set({ columnBackgroundColor: undefined })}
             >
               Clear
@@ -659,10 +627,10 @@ function ColumnsBlockFields({
           value={block.borderStyle}
           onChange={(v) => set({ borderStyle: v as BorderStyle })}
           options={[
-            { value: "none", label: "None" },
-            { value: "solid", label: "Solid" },
-            { value: "dashed", label: "Dashed" },
-            { value: "dotted", label: "Dotted" },
+            { value: "none",   label: "None",   icon: BorderNone01Icon },
+            { value: "solid",  label: "Solid",  icon: MinusSignIcon },
+            { value: "dashed", label: "Dashed", icon: DashedLine01Icon },
+            { value: "dotted", label: "Dotted", icon: EllipsisIcon },
           ]}
         />
       </Field>
@@ -670,19 +638,11 @@ function ColumnsBlockFields({
       {block.borderStyle !== "none" && (
         <Field>
           <FieldLabel>Border color</FieldLabel>
-          <div className="grid grid-cols-[28px_1fr] items-center gap-2">
-            <input
-              type="color"
-              value={block.borderColor}
-              onChange={(e) => set({ borderColor: e.target.value })}
-              className="h-7 w-7 cursor-pointer rounded border p-0.5"
-            />
-            <Input
-              value={block.borderColor}
-              onChange={(e) => set({ borderColor: e.target.value })}
-              className="h-7 font-mono text-xs"
-            />
-          </div>
+          <ColorField
+            value={block.borderColor}
+            allowTransparent={false}
+            onChange={(v) => set({ borderColor: v ?? "#000000" })}
+          />
         </Field>
       )}
 
