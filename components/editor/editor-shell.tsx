@@ -1066,7 +1066,7 @@ function HeaderTitle({
         title="Rename"
         className="rounded-md px-1.5 py-0.5 text-sm font-semibold tracking-tight text-foreground transition-colors hover:bg-muted"
       >
-        {name || "Untitled Email"}
+        {name || "Untitled email"}
       </button>
     )
   }

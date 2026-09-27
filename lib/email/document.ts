@@ -212,7 +212,7 @@ const ARTICLE_PLACEHOLDER_IMAGE =
 
 export const initialEmailDocument: EmailDocument = {
   id: "default",
-  name: "Untitled Campaign",
+  name: "Untitled email",
   subject: "",
   fromName: "",
   fromEmail: "",
@@ -289,7 +289,7 @@ export function createDocument(
 ): EmailDocument {
   return {
     id: createId(),
-    name: "Untitled Campaign",
+    name: "Untitled email",
     subject: "",
     fromName: "",
     fromEmail: "",

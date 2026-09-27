@@ -1296,7 +1296,7 @@ export const PREBUILT_TEMPLATES: PrebuiltTemplate[] = [
  */
 export function blankDocument(): EmailDocument {
   return createDocument({
-    name: "Untitled Campaign",
+    name: "Untitled email",
     blocks: [
       blk("heading", { text: "<p>Your heading</p>", level: 1, align: "left" }),
       blk("paragraph", {
