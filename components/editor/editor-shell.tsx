@@ -24,6 +24,7 @@ import {
   Cancel01Icon,
   Copy01Icon,
   DoorOpenIcon,
+  Download01Icon,
   LayoutTwoColumnIcon,
   PaintBrush01Icon,
 } from "@hugeicons/core-free-icons"
@@ -162,15 +163,11 @@ export function EditorShell({
   initialDocument,
   onSave,
   onExit,
-  onSaveAsTemplate,
-  mode = "campaign",
   renderAssistant,
 }: {
   initialDocument?: EmailDocument
   onSave?: (doc: EmailDocument) => Promise<void>
   onExit?: () => void
-  onSaveAsTemplate?: (doc: EmailDocument, name: string) => Promise<void>
-  mode?: "campaign" | "template-creator" | "template-editor"
   /**
    * Optional assistant, rendered as a tab in the left sidebar beside the block
    * library. A render prop rather than a built-in so /studio can host the agent
@@ -198,9 +195,6 @@ export function EditorShell({
   const [sidebarOpen, setSidebarOpen] = React.useState(true)
   const saveStatusTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const [saveTemplateDialogOpen, setSaveTemplateDialogOpen] = React.useState(false)
-  const [templateName, setTemplateName] = React.useState("")
-  const [savingTemplate, setSavingTemplate] = React.useState(false)
   const [pasteOpen, setPasteOpen] = React.useState(false)
   const [pasteJsonText, setPasteJsonText] = React.useState("")
 
@@ -460,20 +454,20 @@ export function EditorShell({
     }
   }, [pasteJsonText, showDockStatus, updateDocument])
 
-  const handleSaveAsTemplateSubmit = React.useCallback(async () => {
-    if (!templateName.trim()) return
-    setSavingTemplate(true)
-    try {
-      if (onSaveAsTemplate) {
-        await onSaveAsTemplate(document, templateName)
-      }
-      setSaveTemplateDialogOpen(false)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setSavingTemplate(false)
-    }
-  }, [templateName, document, onSaveAsTemplate])
+  // Hands the document over as a .json file, so it can be loaded back later
+  // with Paste JSON or fed straight into your own app.
+  const downloadJson = React.useCallback(() => {
+    const current = documentRef.current
+    const blob = new Blob([JSON.stringify(current, null, 2)], {
+      type: "application/json",
+    })
+    const url = URL.createObjectURL(blob)
+    const anchor = globalThis.document.createElement("a")
+    anchor.href = url
+    anchor.download = `${current.name.trim().replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "email"}.json`
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }, [])
 
   const renameDocument = React.useCallback(
     (name: string) =>
@@ -681,12 +675,8 @@ export function EditorShell({
           onUndo={undo}
           onRedo={redo}
           status={dockStatus}
-          mode={mode}
           onSaveAndExit={() => void saveAndExit()}
-          onSaveAsTemplate={() => {
-            setTemplateName(document.name || "")
-            setSaveTemplateDialogOpen(true)
-          }}
+          onDownloadJson={downloadJson}
           onCopyJson={() => void copyTemplateJson()}
           onPasteJson={() => setPasteOpen(true)}
           view={view}
@@ -806,42 +796,6 @@ export function EditorShell({
 
             </div>
 
-      {/* Save as Template Dialog */}
-      <Dialog open={saveTemplateDialogOpen} onOpenChange={setSaveTemplateDialogOpen}>
-        <DialogPopup className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Save as template</DialogTitle>
-            <DialogDescription>
-              Enter a name for this template to save it to your library.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogPanel>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="template-name-input">Template name</FieldLabel>
-              <Input
-                id="template-name-input"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                placeholder="e.g. Monthly Newsletter, Product Promo"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && templateName.trim()) handleSaveAsTemplateSubmit();
-                }}
-              />
-            </Field>
-          </FieldGroup>
-          </DialogPanel>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSaveTemplateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveAsTemplateSubmit} disabled={savingTemplate || !templateName.trim()}>
-              {savingTemplate ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogPopup>
-      </Dialog>
 
       {/* Paste JSON Dialog */}
       <Dialog open={pasteOpen} onOpenChange={setPasteOpen}>
@@ -916,9 +870,8 @@ function EditorHeader({
   onUndo,
   onRedo,
   status,
-  mode,
   onSaveAndExit,
-  onSaveAsTemplate,
+  onDownloadJson,
   onCopyJson,
   onPasteJson,
   view,
@@ -935,9 +888,8 @@ function EditorHeader({
   onUndo?: () => void
   onRedo?: () => void
   status: DockStatus
-  mode: "campaign" | "template-creator" | "template-editor"
   onSaveAndExit: () => void
-  onSaveAsTemplate: () => void
+  onDownloadJson: () => void
   onCopyJson: () => void
   onPasteJson: () => void
   view: EditorView
@@ -1077,28 +1029,16 @@ function EditorHeader({
         {/* Vertical Divider */}
         <div className="h-4 w-px bg-border" />
 
-        {/* Action Buttons. In template-creator mode the only real persist
-            path is "save as template", so that takes the primary slot. */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-1">
-          {mode === "template-creator" ? (
-            <Button
-              onClick={onSaveAsTemplate}
-              variant="default"
-              size="sm"
-              className="h-8 px-4 font-semibold shadow-xs"
-            >
-              Save as template
-            </Button>
-          ) : (
-            <Button
-              onClick={onSave}
-              variant="default"
-              size="sm"
-              className="h-8 px-4 font-semibold shadow-xs"
-            >
-              Save
-            </Button>
-          )}
+          <Button
+            onClick={onSave}
+            variant="default"
+            size="sm"
+            className="h-8 px-4 font-semibold shadow-xs"
+          >
+            Save
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -1119,15 +1059,15 @@ function EditorHeader({
                 <HugeiconsIcon icon={LayoutTwoColumnIcon} strokeWidth={2} className="size-4 mr-2" />
                 Paste JSON
               </DropdownMenuItem>
-              {mode !== "template-creator" && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onSaveAndExit}>
-                    <HugeiconsIcon icon={DoorOpenIcon} strokeWidth={2} className="size-4 mr-2" />
-                    Save and exit
-                  </DropdownMenuItem>
-                </>
-              )}
+              <DropdownMenuItem onClick={onDownloadJson}>
+                <HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-4 mr-2" />
+                Download JSON
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onSaveAndExit}>
+                <HugeiconsIcon icon={DoorOpenIcon} strokeWidth={2} className="size-4 mr-2" />
+                Save and exit
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
