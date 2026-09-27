@@ -25,7 +25,7 @@
       "description": "Turns an email document into table-based HTML with inlined styles that survives Outlook and Gmail. Includes the social icon set, container shadow helper and raw-HTML sanitiser.",
       "dependencies": [],
       "registryDependencies": [
-        "email-document"
+        "http://localhost:3000/r/email-document.json"
       ],
       "files": [
         {
@@ -62,7 +62,7 @@
       "description": "Ready-made email documents to open the editor with.",
       "dependencies": [],
       "registryDependencies": [
-        "email-document"
+        "http://localhost:3000/r/email-document.json"
       ],
       "files": [
         {
@@ -73,18 +73,153 @@
       ]
     },
     {
+      "name": "email-core",
+      "type": "registry:ui",
+      "title": "Email core",
+      "description": "The <Email> wrapper, the theme every email component reads, and renderEmail() to turn a tree into sendable HTML. Every email block installs this.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/email/email.tsx",
+          "type": "registry:component",
+          "target": "components/email/email.tsx"
+        },
+        {
+          "path": "components/email/theme.ts",
+          "type": "registry:component",
+          "target": "components/email/theme.ts"
+        },
+        {
+          "path": "components/email/render.ts",
+          "type": "registry:component",
+          "target": "components/email/render.ts"
+        },
+        {
+          "path": "components/email/block-row.tsx",
+          "type": "registry:component",
+          "target": "components/email/block-row.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-heading",
+      "type": "registry:ui",
+      "title": "Heading",
+      "description": "A title in one of three sizes.",
+      "dependencies": [],
+      "registryDependencies": [
+        "http://localhost:3000/r/email-core.json"
+      ],
+      "files": [
+        {
+          "path": "components/email/heading.tsx",
+          "type": "registry:component",
+          "target": "components/email/heading.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-text",
+      "type": "registry:ui",
+      "title": "Text",
+      "description": "A paragraph of body copy.",
+      "dependencies": [],
+      "registryDependencies": [
+        "http://localhost:3000/r/email-core.json"
+      ],
+      "files": [
+        {
+          "path": "components/email/text.tsx",
+          "type": "registry:component",
+          "target": "components/email/text.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A call to action link, plus ButtonGroup and ButtonLink for several side by side.",
+      "dependencies": [],
+      "registryDependencies": [
+        "http://localhost:3000/r/email-core.json"
+      ],
+      "files": [
+        {
+          "path": "components/email/button.tsx",
+          "type": "registry:component",
+          "target": "components/email/button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-image",
+      "type": "registry:ui",
+      "title": "Image",
+      "description": "A centred image, optionally linked.",
+      "dependencies": [],
+      "registryDependencies": [
+        "http://localhost:3000/r/email-core.json"
+      ],
+      "files": [
+        {
+          "path": "components/email/image.tsx",
+          "type": "registry:component",
+          "target": "components/email/image.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-divider",
+      "type": "registry:ui",
+      "title": "Divider",
+      "description": "A thin horizontal line that renders the same in Outlook.",
+      "dependencies": [],
+      "registryDependencies": [
+        "http://localhost:3000/r/email-core.json"
+      ],
+      "files": [
+        {
+          "path": "components/email/divider.tsx",
+          "type": "registry:component",
+          "target": "components/email/divider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-spacer",
+      "type": "registry:ui",
+      "title": "Spacer",
+      "description": "Empty vertical space of an exact height.",
+      "dependencies": [],
+      "registryDependencies": [
+        "http://localhost:3000/r/email-core.json"
+      ],
+      "files": [
+        {
+          "path": "components/email/spacer.tsx",
+          "type": "registry:component",
+          "target": "components/email/spacer.tsx"
+        }
+      ]
+    },
+    {
       "name": "editor-primitives",
       "type": "registry:ui",
       "title": "Editor primitives",
       "description": "The three components the editor needs that shadcn/ui does not ship: a stacking-aware dialog, the imperative alert/confirm/prompt helpers, and the drag-to-set range slider used throughout the inspector.",
       "dependencies": [
         "@base-ui/react@1.8.0",
+        "color@5.0.3",
         "lucide-react@1.47.0",
-        "motion@13.4.4"
+        "motion@13.4.4",
+        "radix-ui@1.6.7"
       ],
       "registryDependencies": [
         "button",
-        "input"
+        "input",
+        "select"
       ],
       "files": [
         {
@@ -101,6 +236,11 @@
           "path": "components/motion/range-slider.tsx",
           "type": "registry:component",
           "target": "components/motion/range-slider.tsx"
+        },
+        {
+          "path": "components/ui/color-picker.tsx",
+          "type": "registry:component",
+          "target": "components/ui/color-picker.tsx"
         }
       ]
     },
@@ -117,8 +257,8 @@
         "@hugeicons/react@1.1.10"
       ],
       "registryDependencies": [
-        "email-compiler",
-        "email-document"
+        "http://localhost:3000/r/email-compiler.json",
+        "http://localhost:3000/r/email-document.json"
       ],
       "files": [
         {
@@ -164,7 +304,7 @@
         "@hugeicons/react@1.1.10"
       ],
       "registryDependencies": [
-        "email-document",
+        "http://localhost:3000/r/email-document.json",
         "separator"
       ],
       "files": [
@@ -194,19 +334,17 @@
         "lucide-react@1.47.0"
       ],
       "registryDependencies": [
-        "accordion",
-        "badge",
         "button",
-        "editor-primitives",
-        "email-compiler",
-        "email-document",
+        "http://localhost:3000/r/editor-primitives.json",
+        "http://localhost:3000/r/email-compiler.json",
+        "http://localhost:3000/r/email-document.json",
         "field",
         "input",
+        "popover",
         "scroll-area",
         "select",
         "separator",
         "textarea",
-        "toggle-group",
         "tooltip"
       ],
       "files": [
@@ -257,7 +395,7 @@
         "@tiptap/suggestion@3.31.3"
       ],
       "registryDependencies": [
-        "email-document"
+        "http://localhost:3000/r/email-document.json"
       ],
       "files": [
         {
@@ -289,7 +427,7 @@
       ],
       "registryDependencies": [
         "button",
-        "editor-primitives",
+        "http://localhost:3000/r/editor-primitives.json",
         "field",
         "input",
         "select",
@@ -320,11 +458,9 @@
       "description": "Document-level theme: page and content colour, width, font, radius and spacing, with presets. Values live on the document and are written as inline styles at compile time, so nothing leaks into the host app.",
       "dependencies": [],
       "registryDependencies": [
-        "accordion",
-        "editor-primitives",
-        "email-document",
+        "http://localhost:3000/r/editor-primitives.json",
+        "http://localhost:3000/r/email-document.json",
         "field",
-        "input",
         "select"
       ],
       "files": [
@@ -352,8 +488,8 @@
       "registryDependencies": [
         "badge",
         "button",
-        "editor-primitives",
-        "email-document",
+        "http://localhost:3000/r/editor-primitives.json",
+        "http://localhost:3000/r/email-document.json",
         "field",
         "input",
         "scroll-area",
@@ -413,25 +549,26 @@
         "lucide-react@1.47.0"
       ],
       "registryDependencies": [
-        "block-inspector",
-        "block-palette",
+        "http://localhost:3000/r/block-inspector.json",
+        "http://localhost:3000/r/block-palette.json",
         "button",
         "dropdown-menu",
-        "editor-panels",
-        "editor-primitives",
-        "email-canvas",
-        "email-compiler",
-        "email-document",
+        "http://localhost:3000/r/editor-panels.json",
+        "http://localhost:3000/r/editor-primitives.json",
+        "http://localhost:3000/r/email-canvas.json",
+        "http://localhost:3000/r/email-compiler.json",
+        "http://localhost:3000/r/email-document.json",
         "field",
-        "formatting-toolbar",
+        "http://localhost:3000/r/formatting-toolbar.json",
         "input",
-        "rich-text-editor",
+        "http://localhost:3000/r/rich-text-editor.json",
         "scroll-area",
         "separator",
         "sidebar",
         "spinner",
-        "styles-panel",
-        "textarea"
+        "http://localhost:3000/r/styles-panel.json",
+        "textarea",
+        "tooltip"
       ],
       "files": [
         {
@@ -458,11 +595,11 @@
       "registryDependencies": [
         "button",
         "dropdown-menu",
-        "email-compiler",
-        "email-document",
-        "email-editor",
+        "http://localhost:3000/r/email-compiler.json",
+        "http://localhost:3000/r/email-document.json",
+        "http://localhost:3000/r/email-editor.json",
         "scroll-area",
-        "styles-panel"
+        "http://localhost:3000/r/styles-panel.json"
       ],
       "files": [
         {

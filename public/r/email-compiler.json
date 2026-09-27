@@ -5,7 +5,7 @@
   "description": "Turns an email document into table-based HTML with inlined styles that survives Outlook and Gmail. Includes the social icon set, container shadow helper and raw-HTML sanitiser.",
   "dependencies": [],
   "registryDependencies": [
-    "email-document"
+    "http://localhost:3000/r/email-document.json"
   ],
   "files": [
     {

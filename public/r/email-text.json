@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "email-text",
+  "title": "Text",
+  "description": "A paragraph of body copy.",
+  "dependencies": [],
+  "registryDependencies": [
+    "http://localhost:3000/r/email-core.json"
+  ],
+  "files": [
+    {
+      "path": "components/email/text.tsx",
+      "content": "import type * as React from \"react\"\n\nimport { BlockRow, type BlockRowProps } from \"./block-row\"\nimport { resolveTheme, type EmailTheme } from \"./theme\"\n\nexport type TextProps = BlockRowProps & {\n  align?: \"left\" | \"center\" | \"right\"\n  color?: string\n  theme?: Partial<EmailTheme>\n  children: React.ReactNode\n}\n\n/** A paragraph of body copy. */\nexport function Text({\n  align = \"left\",\n  color,\n  theme,\n  children,\n  ...row\n}: TextProps) {\n  const t = resolveTheme(theme)\n\n  return (\n    <BlockRow {...row}>\n      <tr>\n        <td\n          align={align}\n          style={{ padding: `8px ${t.padding}px 16px ${t.padding}px` }}\n        >\n          <p\n            style={{\n              margin: \"0 0 8px 0\",\n              color: color ?? t.textColor,\n              fontFamily: t.fontFamily,\n              fontSize: 16,\n              lineHeight: 1.65,\n            }}\n          >\n            {children}\n          </p>\n        </td>\n      </tr>\n    </BlockRow>\n  )\n}\n",
+      "type": "registry:component",
+      "target": "components/email/text.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

@@ -10,8 +10,8 @@
   "registryDependencies": [
     "badge",
     "button",
-    "editor-primitives",
-    "email-document",
+    "http://localhost:3000/r/editor-primitives.json",
+    "http://localhost:3000/r/email-document.json",
     "field",
     "input",
     "scroll-area",

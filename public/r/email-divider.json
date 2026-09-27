@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "email-divider",
+  "title": "Divider",
+  "description": "A thin horizontal line that renders the same in Outlook.",
+  "dependencies": [],
+  "registryDependencies": [
+    "http://localhost:3000/r/email-core.json"
+  ],
+  "files": [
+    {
+      "path": "components/email/divider.tsx",
+      "content": "import { BlockRow, type BlockRowProps } from \"./block-row\"\nimport { resolveTheme, type EmailTheme } from \"./theme\"\n\nexport type DividerProps = BlockRowProps & {\n  /** Line colour. Drawn at 24% opacity, so the text colour works well. */\n  color?: string\n  theme?: Partial<EmailTheme>\n}\n\nexport function Divider({ color, theme, ...row }: DividerProps) {\n  const t = resolveTheme(theme)\n\n  return (\n    <BlockRow {...row}>\n      <tr>\n        <td style={{ padding: `8px ${t.padding}px 28px ${t.padding}px` }}>\n          {/* a 1px div with content, not <hr>: Outlook draws <hr> its own way */}\n          <div\n            style={{\n              height: 1,\n              background: color ?? t.textColor,\n              opacity: 0.24,\n              lineHeight: \"1px\",\n              fontSize: 1,\n            }}\n          >\n            &nbsp;\n          </div>\n        </td>\n      </tr>\n    </BlockRow>\n  )\n}\n",
+      "type": "registry:component",
+      "target": "components/email/divider.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}
