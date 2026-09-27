@@ -408,6 +408,9 @@ export function EditorShell({
     return () => window.removeEventListener("beforeunload", onBeforeUnload)
   }, [])
 
+  // Nothing calls this, downloadJson or the Paste JSON dialog right now — the
+  // ⋯ menu that drove all three came off the header. Copy-as-JSON is being
+  // re-homed elsewhere in the UI, so all three stay. Do not prune as dead code.
   const copyTemplateJson = React.useCallback(async () => {
     await copyToClipboard(JSON.stringify(document, null, 2))
     showDockStatus("copied")
@@ -649,20 +652,21 @@ export function EditorShell({
   return (
     <TooltipProvider>
     <EditorToolbarProvider>
-      <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
+      {/* w-full, not w-screen: 100vw counts the vertical scrollbar, so on any
+          page that has one the shell overhangs the viewport by the scrollbar's
+          width and the body shows through as a strip down the right edge. */}
+      <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+        {/* Header — the bar across the top: back chevron, document name,
+            undo/redo, and the view + viewport toggles. */}
         <EditorHeader
           documentName={document.name}
           onRename={renameDocument}
           onExit={onExit}
-          onSave={() => void saveDocument()}
           canUndo={canUndo}
           canRedo={canRedo}
           onUndo={undo}
           onRedo={redo}
           status={dockStatus}
-          onDownloadJson={downloadJson}
-          onCopyJson={() => void copyTemplateJson()}
-          onPasteJson={() => setPasteOpen(true)}
           view={view}
           onViewChange={setView}
           viewport={previewViewport}
@@ -674,6 +678,8 @@ export function EditorShell({
           }}
         />
         
+        {/* Body — everything under the header, as one row:
+            left sidebar | center canvas | right sidebar. */}
         <div className="flex-1 min-h-0 flex relative">
           <DndContext
             id="editor-dnd"
@@ -697,6 +703,8 @@ export function EditorShell({
               open={view === "editor" && sidebarOpen}
               onOpenChange={setSidebarOpen}
             >
+              {/* Left sidebar (blocks) — the block library you drag from,
+                  plus the theme button. Collapses in HTML/preview. */}
               <EditorLeftSidebar
                 onAddBlock={addBlock}
                 onOpenTheme={() => {
@@ -709,7 +717,11 @@ export function EditorShell({
                   selectedBlockId,
                 })}
               />
-              <SidebarInset className="min-h-0 overflow-hidden flex flex-col bg-background">
+              {/* Center canvas — the email itself, or the HTML/preview pane
+                  standing in for it. Its own padding lives on the scroll
+                  container inside EmailCanvas (p-4), and it is the
+                  positioning context the right sidebar floats against. */}
+              <SidebarInset className="min-h-0 overflow-hidden flex flex-col bg-background md:peer-data-[variant=inset]:ml-2!">
                 <div className="relative flex min-h-0 flex-1 overflow-hidden">
               {view === "preview" && compiled ? (
                 <EmailPreviewPane
@@ -734,8 +746,11 @@ export function EditorShell({
               </CanvasProvider>
               )}
 
+              {/* Right sidebar (inspector) — block settings, or the theme
+                  panel. Floats as a card over the canvas rather than sitting
+                  beside it, so the canvas keeps its full width. */}
               {view === "editor" && inspectorOpen && (
-                <aside className="absolute right-4 top-4 bottom-4 z-20 flex w-[328px] flex-col overflow-hidden rounded-xl border bg-card shadow-2xl">
+                <aside className="absolute right-4 top-4 bottom-4 z-20 flex w-[328px] flex-col overflow-hidden rounded-xl border bg-secondary shadow-2xl">
                   {rightPanel === "theme" ? (
                     <StylesPanel
                       document={document}
@@ -839,15 +854,11 @@ function EditorHeader({
   documentName,
   onRename,
   onExit,
-  onSave,
   canUndo,
   canRedo,
   onUndo,
   onRedo,
   status,
-  onDownloadJson,
-  onCopyJson,
-  onPasteJson,
   view,
   onViewChange,
   viewport,
@@ -856,15 +867,11 @@ function EditorHeader({
   documentName: string
   onRename: (name: string) => void
   onExit?: () => void
-  onSave?: () => void
   canUndo?: boolean
   canRedo?: boolean
   onUndo?: () => void
   onRedo?: () => void
   status: DockStatus
-  onDownloadJson: () => void
-  onCopyJson: () => void
-  onPasteJson: () => void
   view: EditorView
   onViewChange: (view: EditorView) => void
   viewport: PreviewViewport
@@ -876,38 +883,38 @@ function EditorHeader({
     { id: "preview", label: "Preview", icon: EyeIcon },
   ] as const
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between bg-background px-4">
+    <header className="flex h-10 shrink-0 items-center justify-between bg-background px-3">
       {/* Left: Back chevron (only when the host gives us somewhere to go) + Title */}
       <div className="flex items-center gap-3">
         {onExit && (
           <button
             onClick={onExit}
-            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             type="button"
             title="Leave the editor"
             aria-label="Leave the editor"
           >
-            <ChevronLeftIcon className="size-4" />
+            <ChevronLeftIcon className="size-3.5" />
           </button>
         )}
         <HeaderTitle name={documentName} onRename={onRename} />
       </div>
 
       {/* Center: Switcher (Editor / HTML / Preview) */}
-      <div className="flex items-center gap-0.5 rounded-lg bg-muted p-1 border border-border/10">
+      <div className="flex h-7 items-center gap-0.5 rounded-md bg-muted p-0.5">
         {views.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             type="button"
             onClick={() => onViewChange(id)}
             className={cn(
-              "flex items-center gap-1.5 rounded-md px-3.5 py-1 text-xs transition-colors",
+              "flex h-6 items-center gap-1.5 rounded-[5px] px-2.5 text-[11px] transition-colors",
               view === id
-                ? "bg-card font-semibold text-foreground shadow-xs border border-border/5"
+                ? "bg-card font-medium text-foreground shadow-xs"
                 : "font-medium text-muted-foreground hover:text-foreground"
             )}
           >
-            <Icon className={cn("size-3", view === id && "text-primary")} />
+            <Icon className={cn("size-3.5", view === id && "text-primary")} />
             {label}
           </button>
         ))}
@@ -919,7 +926,7 @@ function EditorHeader({
         {status !== "idle" && (
           <span
             className={cn(
-              "flex items-center gap-1 text-xs font-medium select-none mr-1.5",
+              "flex items-center gap-1 text-[11px] font-medium select-none mr-1.5",
               status === "saved" && "text-emerald-500",
               status === "error" && "text-destructive",
               (status === "copied" || status === "saving") && "text-muted-foreground"
@@ -947,7 +954,7 @@ function EditorHeader({
           <button
             onClick={onUndo}
             disabled={!canUndo}
-            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 transition-colors"
+            className="flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 transition-colors"
             type="button"
             title="Undo"
             aria-label="Undo"
@@ -957,7 +964,7 @@ function EditorHeader({
           <button
             onClick={onRedo}
             disabled={!canRedo}
-            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 transition-colors"
+            className="flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 transition-colors"
             type="button"
             title="Redo"
             aria-label="Redo"
@@ -967,19 +974,19 @@ function EditorHeader({
         </div>
 
         {/* Vertical Divider */}
-        <div className="h-4 w-px bg-border" />
+        <span aria-hidden className="h-3.5 w-px bg-border/70" />
 
         {/* Device Viewport Toggle (Desktop/Mobile) — drives the preview frame */}
-        <div className="flex items-center gap-0.5 rounded-lg bg-muted p-1 border border-border/10">
+        <div className="flex h-7 items-center gap-0.5 rounded-md bg-muted p-0.5">
           <button
             type="button"
             title="Desktop preview"
             aria-label="Desktop preview"
             onClick={() => onViewportChange("desktop")}
             className={cn(
-              "flex size-7 items-center justify-center rounded-md transition-colors",
+              "flex size-6 items-center justify-center rounded-[5px] transition-colors",
               viewport === "desktop"
-                ? "bg-card text-foreground shadow-xs border border-border/5"
+                ? "bg-card text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -991,9 +998,9 @@ function EditorHeader({
             aria-label="Mobile preview"
             onClick={() => onViewportChange("mobile")}
             className={cn(
-              "flex size-7 items-center justify-center rounded-md transition-colors",
+              "flex size-6 items-center justify-center rounded-[5px] transition-colors",
               viewport === "mobile"
-                ? "bg-card text-foreground shadow-xs border border-border/5"
+                ? "bg-card text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -1001,46 +1008,6 @@ function EditorHeader({
           </button>
         </div>
 
-        {/* Vertical Divider */}
-        <div className="h-4 w-px bg-border" />
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1">
-          <Button
-            onClick={onSave}
-            variant="default"
-            size="sm"
-            className="h-8 px-4 font-semibold shadow-xs"
-          >
-            Save
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                type="button"
-                title="More actions"
-                aria-label="More actions"
-              >
-                <MoreHorizontalIcon className="size-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem onClick={onCopyJson}>
-                <HugeiconsIcon icon={Copy01Icon} strokeWidth={2} className="size-4 mr-2" />
-                Copy JSON
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onPasteJson}>
-                <HugeiconsIcon icon={LayoutTwoColumnIcon} strokeWidth={2} className="size-4 mr-2" />
-                Paste JSON
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDownloadJson}>
-                <HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-4 mr-2" />
-                Download JSON
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </div>
     </header>
   )
@@ -1064,7 +1031,7 @@ function HeaderTitle({
         type="button"
         onClick={() => setDraft(name)}
         title="Rename"
-        className="rounded-md px-1.5 py-0.5 text-sm font-semibold tracking-tight text-foreground transition-colors hover:bg-muted"
+        className="rounded-md px-1.5 py-0.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
       >
         {name || "Untitled email"}
       </button>
@@ -1102,7 +1069,7 @@ function EmailPreviewPane({
   viewport: PreviewViewport
 }) {
   return (
-    <div className="flex min-h-0 flex-1 justify-center overflow-hidden bg-muted/30 p-4">
+    <div className="flex min-h-0 flex-1 justify-center overflow-hidden p-4">
       <iframe
         title="Email preview"
         srcDoc={html}
@@ -1317,6 +1284,9 @@ function DraggableBlockTile({
   )
 }
 
+// Center canvas. The section paints the page background; the div inside it
+// scrolls and carries the padding that frames the email (px-8 py-8, plus room
+// on the right for the inspector when it is open).
 function EmailCanvas({
   document,
   inspectorOpen,
@@ -1333,8 +1303,8 @@ function EmailCanvas({
     >
       <div
         className={cn(
-          "flex min-h-full w-full flex-col items-center overflow-auto px-8 py-8 transition-[padding] duration-200 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          inspectorOpen && "xl:pr-[376px]"
+          "flex min-h-full w-full flex-col items-center overflow-auto p-4 transition-[padding] duration-200 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          inspectorOpen && "xl:pr-[360px]"
         )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
