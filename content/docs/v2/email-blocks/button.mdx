@@ -1,0 +1,92 @@
+---
+title: Button
+description: A call to action link, styled from your theme's button settings.
+icon: MousePointerClick
+---
+
+import { Button, ButtonGroup, ButtonLink } from '@/components/email/button';
+
+<EmailPreview height={140}>
+  <Button href="https://example.com">Read the full newsletter</Button>
+</EmailPreview>
+
+## Installation
+
+<InstallBlock name="email-button" />
+
+## Usage
+
+```tsx
+import { Button } from '@/components/email/button';
+
+<Button href="https://example.com">Read the full newsletter</Button>
+```
+
+Buttons are plain `<a>` tags with inline styles, not `<button>` elements. Email clients strip
+forms and scripts, so a link is the only kind of button that works in an inbox.
+
+## Examples
+
+### Secondary
+
+<EmailPreview height={140}>
+  <Button href="#" variant="secondary">View in browser</Button>
+</EmailPreview>
+
+```tsx
+<Button href="#" variant="secondary">View in browser</Button>
+```
+
+### Full width
+
+<EmailPreview height={140}>
+  <Button href="#" fullWidth>Claim your spot</Button>
+</EmailPreview>
+
+```tsx
+<Button href="#" fullWidth>Claim your spot</Button>
+```
+
+### Two buttons side by side
+
+`<Button>` takes a whole row. To put two actions next to each other, use `<ButtonGroup>` with a
+`<ButtonLink>` for each one.
+
+<EmailPreview height={140}>
+  <ButtonGroup align="center">
+    <ButtonLink href="#">Upgrade</ButtonLink>
+    <ButtonLink href="#" variant="secondary">Maybe later</ButtonLink>
+  </ButtonGroup>
+</EmailPreview>
+
+```tsx
+<ButtonGroup align="center">
+  <ButtonLink href="#">Upgrade</ButtonLink>
+  <ButtonLink href="#" variant="secondary">Maybe later</ButtonLink>
+</ButtonGroup>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    href: { type: 'string', required: true },
+    variant: { type: "'primary' | 'secondary'", default: "'primary'" },
+    align: { type: "'left' | 'center' | 'right'", default: "'left'" },
+    fullWidth: {
+      type: 'boolean',
+      description: 'Stretch to the content width. Always centred.',
+      default: 'false',
+    },
+    theme: {
+      type: 'Partial<EmailTheme>',
+      description: 'Override the theme for this button only. Colours, radius, padding and font size all come from the button settings.',
+    },
+    backgroundColor: { type: 'string', description: 'Background behind the whole row.' },
+    paddingTop: { type: 'number', default: '0' },
+    paddingBottom: { type: 'number', default: '0' },
+  }}
+/>
+
+`<ButtonLink>` takes `href`, `variant`, `fullWidth` and `theme`. `<ButtonGroup>` takes `align`,
+`theme` and the row props.

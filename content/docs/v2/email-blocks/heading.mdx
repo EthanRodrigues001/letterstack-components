@@ -1,0 +1,67 @@
+---
+title: Heading
+description: A title in one of three sizes.
+icon: Heading
+---
+
+import { Heading } from '@/components/email/heading';
+
+<EmailPreview height={150}>
+  <Heading>Welcome to LetterStack</Heading>
+</EmailPreview>
+
+## Installation
+
+<InstallBlock name="email-heading" />
+
+## Usage
+
+```tsx
+import { Heading } from '@/components/email/heading';
+
+<Heading>Welcome to LetterStack</Heading>
+```
+
+## Examples
+
+### Levels
+
+<EmailPreview height={260}>
+  <Heading level={1}>Level 1, 32px</Heading>
+  <Heading level={2}>Level 2, 24px</Heading>
+  <Heading level={3}>Level 3, 18px</Heading>
+</EmailPreview>
+
+```tsx
+<Heading level={1}>Level 1, 32px</Heading>
+<Heading level={2}>Level 2, 24px</Heading>
+<Heading level={3}>Level 3, 18px</Heading>
+```
+
+### Centred on a coloured row
+
+<EmailPreview height={170}>
+  <Heading level={2} align="center" backgroundColor="#fef3ee" paddingTop={8} paddingBottom={16}>
+    This week in design
+  </Heading>
+</EmailPreview>
+
+```tsx
+<Heading level={2} align="center" backgroundColor="#fef3ee" paddingTop={8} paddingBottom={16}>
+  This week in design
+</Heading>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    level: { type: '1 | 2 | 3', default: '1' },
+    align: { type: "'left' | 'center' | 'right'", default: "'left'" },
+    color: { type: 'string', description: "Defaults to the theme's textColor." },
+    theme: { type: 'Partial<EmailTheme>' },
+    backgroundColor: { type: 'string', description: 'Background behind the whole row.' },
+    paddingTop: { type: 'number', default: '0' },
+    paddingBottom: { type: 'number', default: '0' },
+  }}
+/>

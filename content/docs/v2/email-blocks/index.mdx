@@ -1,0 +1,97 @@
+---
+title: Overview
+description: Email components you write in React and render to HTML that works in Gmail, Outlook and Apple Mail.
+icon: Mail
+---
+
+import { Email } from '@/components/email/email';
+import { Heading } from '@/components/email/heading';
+import { Text } from '@/components/email/text';
+import { Button } from '@/components/email/button';
+import { Divider } from '@/components/email/divider';
+
+These are the same blocks the LetterStack editor uses, as React components. Write an email in
+JSX, render it to a string, and send that string with any provider: Resend, SES, Postmark or
+nodemailer.
+
+<EmailPreview full height={330}>
+  <Email preview="Your weekly roundup is here">
+    <Heading>Welcome to LetterStack</Heading>
+    <Text>A beautiful way to send your monthly newsletter. Build with blocks, preview in real time, send with confidence.</Text>
+    <Divider />
+    <Button href="https://example.com">Read the full newsletter</Button>
+  </Email>
+</EmailPreview>
+
+```tsx title="emails/welcome.tsx"
+import { Email } from '@/components/email/email';
+import { Heading } from '@/components/email/heading';
+import { Text } from '@/components/email/text';
+import { Divider } from '@/components/email/divider';
+import { Button } from '@/components/email/button';
+
+export function Welcome() {
+  return (
+    <Email preview="Your weekly roundup is here">
+      <Heading>Welcome to LetterStack</Heading>
+      <Text>A beautiful way to send your monthly newsletter.</Text>
+      <Divider />
+      <Button href="https://example.com">Read the full newsletter</Button>
+    </Email>
+  );
+}
+```
+
+## Installation
+
+Each block installs on its own with the shadcn CLI and brings `email`, `theme` and `render` along
+with it the first time. To get the wrapper and the theme on their own:
+
+<InstallBlock name="email-core" />
+
+The code is copied into `components/email/`, so it is yours to change.
+
+## Sending
+
+`renderEmail` turns the tree into a full HTML document. It is async, so call it with `await`.
+
+```ts
+import { renderEmail } from '@/components/email/render';
+import { Welcome } from '@/emails/welcome';
+
+const html = await renderEmail(<Welcome />);
+
+await resend.emails.send({
+  from: 'news@example.com',
+  to: 'ada@example.com',
+  subject: 'Welcome',
+  html,
+});
+```
+
+## Theming
+
+Every colour, font, radius and spacing value comes from `components/email/theme.ts`. Change it
+there and every block follows.
+
+The theme has the same shape as the editor's theme panel. Design a look in the editor, copy the
+document's `settings`, and paste them into `theme.ts`.
+
+To change the theme for one email or one block only, pass `theme`:
+
+```tsx
+<Email theme={{ backgroundColor: '#0f172a', contentColor: '#1e293b' }}>
+  <Heading theme={{ textColor: '#f8fafc' }}>Dark mode issue</Heading>
+</Email>
+```
+
+<Callout title="theme isn't inherited">
+  A `theme` passed to `<Email>` styles the wrapper only. Blocks read `theme.ts` unless you pass
+  them a `theme` of their own. Components can't share a React context here, because context
+  doesn't work in server components, which is where most emails get rendered.
+</Callout>
+
+## Rules for every block
+
+- Blocks go inside `<Email>`. Each one is a table row, so it won't render correctly on its own.
+- Every block takes `backgroundColor`, `paddingTop` and `paddingBottom` for the row around it.

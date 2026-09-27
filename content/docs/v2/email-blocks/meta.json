@@ -1,0 +1,8 @@
+{
+  "$schema": "https://fumadocs.dev/schemas/meta.json",
+  "title": "Email blocks",
+  "icon": "Mail",
+  "defaultOpen": true,
+  "pagesIndex": "index",
+  "pages": ["index", "heading", "text", "button", "image", "divider", "spacer"]
+}
