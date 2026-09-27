@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -23,7 +16,7 @@ import {
 } from "@/lib/email/document";
 import themePresets from "@/lib/email/theme-presets.json";
 import { FONT_FAMILIES } from "./editor-types";
-import { OptionToggle } from "./inspector-controls";
+import { ColorField, InspectorSection, OptionToggle } from "./inspector-controls";
 
 type ThemePreset = {
   id: string;
@@ -94,20 +87,17 @@ export function StylesPanel({
   };
 
   return (
-    <div className="flex flex-col overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div className="border-b px-4 py-3">
-        <p className="text-sm font-semibold">Email styles</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Edit the look of your entire email
-        </p>
+    <div className="flex min-h-0 flex-1 flex-col bg-secondary">
+      {/* Header — matches the block inspector's bar so the two panels read
+          as the same surface. */}
+      <div className="flex h-8 shrink-0 items-center bg-secondary px-3">
+        <p className="text-xs font-medium text-muted-foreground">Email styles</p>
       </div>
 
-      <Accordion type="multiple" defaultValue={["themes", "background"]} className="w-full">
-        <AccordionItem value="themes">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Themes
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+      {/* The body is a card lifted onto the secondary bar above it, so the
+          header reads as the surface the panel sits on. */}
+      <div className="min-h-0 flex-1 overflow-auto rounded-t-xl bg-card [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <InspectorSection title="Themes">
             <div className="flex flex-col gap-3">
               <Field>
                 <FieldLabel>Preset theme</FieldLabel>
@@ -139,14 +129,9 @@ export function StylesPanel({
                 </Select>
               </Field>
             </div>
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="background">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Background
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Background">
             <div className="flex flex-col gap-3">
               <StyleColorRow
                 label="Outer background"
@@ -159,14 +144,9 @@ export function StylesPanel({
                 onChange={(v) => set("contentColor", v)}
               />
             </div>
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="text">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Text
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Text">
             <div className="flex flex-col gap-3">
               <Field>
                 <FieldLabel>Font family</FieldLabel>
@@ -192,27 +172,17 @@ export function StylesPanel({
                 onChange={(v) => set("textColor", v)}
               />
             </div>
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="link">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Link
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Link">
             <StyleColorRow
               label="Link color"
               value={s.linkColor}
               onChange={(v) => set("linkColor", v)}
             />
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="button">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Button
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Button">
             <div className="flex flex-col gap-3">
               <StyleColorRow
                 label="Primary bg"
@@ -239,38 +209,23 @@ export function StylesPanel({
               <StyleSliderRow label="Horiz. padding" value={s.buttonPaddingX} min={8}  max={40} suffix="px" onChange={(v) => set("buttonPaddingX", v)} />
               <StyleSliderRow label="Font size"      value={s.buttonFontSize} min={12} max={22} suffix="px" onChange={(v) => set("buttonFontSize",  v)} />
             </div>
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="divider">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Divider
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Divider">
             <p className="text-xs text-muted-foreground">
               1px solid line. Color inherits from the border token.
             </p>
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="layout">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Layout
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Layout">
             <div className="flex flex-col gap-3">
               <StyleSliderRow label="Max width"    value={s.maxWidth} min={480} max={760} suffix="px" onChange={(v) => set("maxWidth", v)} />
               <StyleSliderRow label="Side padding" value={s.padding}  min={0}   max={48}  suffix="px" onChange={(v) => set("padding",  v)} />
               <StyleSliderRow label="Radius"       value={s.radius}   min={0}   max={24}  suffix="px" onChange={(v) => set("radius",   v)} />
             </div>
-          </AccordionContent>
-        </AccordionItem>
+        </InspectorSection>
 
-        <AccordionItem value="shadow">
-          <AccordionTrigger className="px-4 py-3 text-sm font-medium hover:no-underline">
-            Shadow
-          </AccordionTrigger>
-          <AccordionContent className="h-auto px-4 pb-4">
+        <InspectorSection title="Shadow">
             <div className="flex flex-col gap-3">
               <Field>
                 <FieldLabel>Email shadow</FieldLabel>
@@ -284,20 +239,23 @@ export function StylesPanel({
                   ]}
                 />
               </Field>
+              {/* Colour and opacity are one control here: the compiler already
+                  folds them together through hexToRgba when it builds the
+                  box-shadow. */}
               <StyleColorRow
                 label="Color"
                 value={s.shadowColor}
                 onChange={(v) => set("shadowColor", v)}
+                opacity={s.shadowOpacity}
+                onOpacityChange={(v) => set("shadowOpacity", v)}
               />
-              <StyleSliderRow label="Opacity" value={s.shadowOpacity} min={0} max={40} suffix="%" onChange={(v) => set("shadowOpacity", v)} />
               <StyleSliderRow label="Blur" value={s.shadowBlur} min={0} max={80} suffix="px" onChange={(v) => set("shadowBlur", v)} />
               <StyleSliderRow label="Spread" value={s.shadowSpread} min={-12} max={24} suffix="px" onChange={(v) => set("shadowSpread", v)} />
               <StyleSliderRow label="Offset X" value={s.shadowOffsetX} min={-40} max={40} suffix="px" onChange={(v) => set("shadowOffsetX", v)} />
               <StyleSliderRow label="Offset Y" value={s.shadowOffsetY} min={-20} max={60} suffix="px" onChange={(v) => set("shadowOffsetY", v)} />
             </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+        </InspectorSection>
+      </div>
     </div>
   );
 }
@@ -338,27 +296,28 @@ export function StyleColorRow({
   label,
   value,
   onChange,
+  opacity,
+  onOpacityChange,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  /** Percent 0-100; shows the opacity cell when paired with a handler. */
+  opacity?: number;
+  onOpacityChange?: (v: number) => void;
 }) {
   return (
     <div className="flex items-center gap-2">
-      <label className="w-28 shrink-0 text-xs text-muted-foreground">{label}</label>
-      <div className="flex flex-1 items-center gap-1.5">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-7 w-7 shrink-0 cursor-pointer rounded border p-0.5"
-        />
-        <Input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-7 flex-1 font-mono text-xs"
-        />
-      </div>
+      <label className="w-24 shrink-0 text-[11px] text-muted-foreground">
+        {label}
+      </label>
+      <ColorField
+        value={value}
+        allowTransparent={false}
+        onChange={(v) => onChange(v ?? "#000000")}
+        opacity={opacity}
+        onOpacityChange={onOpacityChange}
+      />
     </div>
   );
 }
@@ -380,16 +339,16 @@ export function StyleSliderRow({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <label className="w-28 shrink-0 text-xs text-muted-foreground">{label}</label>
+      <label className="w-24 shrink-0 text-[11px] text-muted-foreground">{label}</label>
       <RangeSlider
         value={value}
         min={min}
         max={max}
         onValueChange={onChange}
         aria-label={label}
-        className="h-7 flex-1 rounded-full"
+        className="h-7 flex-1 rounded-md"
       />
-      <span className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+      <span className="w-10 shrink-0 text-right text-[11px] tabular-nums text-muted-foreground">
         {value}{suffix}
       </span>
     </div>
