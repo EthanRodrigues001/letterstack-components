@@ -124,6 +124,9 @@ export function RichTextEditor({
         heading:         { levels: [1, 2, 3] },
         codeBlock:       false,
         horizontalRule:  false,
+        // starter-kit v3 ships these too; we add our own configured ones below
+        link:            false,
+        underline:       false,
       }),
       Underline,
       TextStyleExtended,

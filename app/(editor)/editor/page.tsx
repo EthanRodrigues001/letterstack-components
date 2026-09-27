@@ -2,16 +2,13 @@
 
 // /editor — the editor on its own, no assistant.
 //
-// Ported from the LetterStack SaaS. What changed: "save as template" used to
-// POST to /api/templates and redirect into a dashboard. There is no dashboard
-// and no database here, so it downloads the document as JSON instead — the
-// playground equivalent of saving, and a useful way to get a document out of
-// the editor and into your own app.
+// Ported from the LetterStack SaaS. "Save as template" is gone since there's
+// no template library here — use Download JSON in the ⋯ menu to get a
+// document out of the editor and into your own app.
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { alertDialog } from "@/components/app-dialogs";
 import { EditorShell } from "@/components/editor/editor-shell";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -44,24 +41,6 @@ export default function EditorPage() {
     setReady(true);
   }, []);
 
-  async function handleSaveAsTemplate(doc: EmailDocument, name: string) {
-    try {
-      const blob = new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${name.trim().replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "email"}.json`;
-      anchor.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-      await alertDialog({
-        title: "Could not export",
-        description: "The browser blocked the download. Try again, or copy the HTML instead.",
-      });
-    }
-  }
-
   // Hold the editor until the draft is read, so EditorShell mounts once with
   // the right document instead of flashing the default first.
   if (!ready) {
@@ -75,9 +54,7 @@ export default function EditorPage() {
 
   return (
     <EditorShell
-      mode="template-creator"
       initialDocument={initialDoc}
-      onSaveAsTemplate={handleSaveAsTemplate}
       onExit={() => router.push("/")}
     />
   );

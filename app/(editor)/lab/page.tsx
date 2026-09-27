@@ -13,7 +13,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { alertDialog } from "@/components/app-dialogs";
 import { AgentPanel } from "@/components/editor/agent/agent-panel";
 import { EditorShell } from "@/components/editor/editor-shell";
 import { Spinner } from "@/components/ui/spinner";
@@ -45,24 +44,6 @@ export default function LabPage() {
     setReady(true);
   }, []);
 
-  async function handleSaveAsTemplate(doc: EmailDocument, name: string) {
-    try {
-      const blob = new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${name.trim().replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "email"}.json`;
-      anchor.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-      await alertDialog({
-        title: "Could not export",
-        description: "The browser blocked the download. Try again, or copy the HTML instead.",
-      });
-    }
-  }
-
   if (!ready) {
     return (
       <div className="flex h-screen items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
@@ -74,9 +55,7 @@ export default function LabPage() {
 
   return (
     <EditorShell
-      mode="template-creator"
       initialDocument={initialDoc}
-      onSaveAsTemplate={handleSaveAsTemplate}
       onExit={() => router.push("/")}
       renderAssistant={({ document, updateDocument, selectedBlockId }) => (
         <AgentPanel

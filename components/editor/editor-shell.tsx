@@ -23,11 +23,10 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Cancel01Icon,
   Copy01Icon,
-  DoorOpenIcon,
+  Download01Icon,
   LayoutTwoColumnIcon,
   PaintBrush01Icon,
 } from "@hugeicons/core-free-icons"
-import { useRouter } from "next/navigation"
 
 import { alertDialog } from "@/components/app-dialogs"
 import { BlockInspector } from "@/components/editor/block-inspector"
@@ -55,7 +54,6 @@ import {
   Field,
   FieldGroup,
   FieldLabel,
-  FieldTitle,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -74,10 +72,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import {
   MoreHorizontalIcon,
   Redo2Icon,
@@ -161,15 +159,11 @@ export function EditorShell({
   initialDocument,
   onSave,
   onExit,
-  onSaveAsTemplate,
-  mode = "campaign",
   renderAssistant,
 }: {
   initialDocument?: EmailDocument
   onSave?: (doc: EmailDocument) => Promise<void>
   onExit?: () => void
-  onSaveAsTemplate?: (doc: EmailDocument, name: string) => Promise<void>
-  mode?: "campaign" | "template-creator" | "template-editor"
   /**
    * Optional assistant, rendered as a tab in the left sidebar beside the block
    * library. A render prop rather than a built-in so /studio can host the agent
@@ -184,11 +178,10 @@ export function EditorShell({
     selectedBlockId: string
   }) => React.ReactNode
 } = {}) {
-  const router = useRouter()
   const [document, setDocument] =
     React.useState<EmailDocument>(() => initialDocument ?? initialEmailDocument)
   const [selectedBlockId, setSelectedBlockId] = React.useState<string>("")
-  const [rightPanel, setRightPanel] = React.useState<"block" | "theme" | "settings" | null>(null)
+  const [rightPanel, setRightPanel] = React.useState<"block" | "theme" | null>(null)
   const [activeDrag, setActiveDrag] = React.useState<ActiveDrag | null>(null)
   const [insertTarget, setInsertTarget] = React.useState<InsertTarget | null>(null)
   const [dockStatus, setDockStatus] = React.useState<DockStatus>("idle")
@@ -197,17 +190,13 @@ export function EditorShell({
   const [sidebarOpen, setSidebarOpen] = React.useState(true)
   const saveStatusTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const [saveTemplateDialogOpen, setSaveTemplateDialogOpen] = React.useState(false)
-  const [templateName, setTemplateName] = React.useState("")
-  const [savingTemplate, setSavingTemplate] = React.useState(false)
   const [pasteOpen, setPasteOpen] = React.useState(false)
   const [pasteJsonText, setPasteJsonText] = React.useState("")
 
   const selectedBlock = findBlock(document.blocks, selectedBlockId)
   const selectedLocation = locateBlock(document.blocks, selectedBlockId)
   const selectedIndex = selectedLocation?.index ?? -1
-  const inspectorOpen =
-    rightPanel === "theme" || rightPanel === "settings" || Boolean(selectedBlock)
+  const inspectorOpen = rightPanel === "theme" || Boolean(selectedBlock)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -459,35 +448,26 @@ export function EditorShell({
     }
   }, [pasteJsonText, showDockStatus, updateDocument])
 
-  const handleSaveAsTemplateSubmit = React.useCallback(async () => {
-    if (!templateName.trim()) return
-    setSavingTemplate(true)
-    try {
-      if (onSaveAsTemplate) {
-        await onSaveAsTemplate(document, templateName)
-      }
-      setSaveTemplateDialogOpen(false)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setSavingTemplate(false)
-    }
-  }, [templateName, document, onSaveAsTemplate])
+  // Hands the document over as a .json file, so it can be loaded back later
+  // with Paste JSON or fed straight into your own app.
+  const downloadJson = React.useCallback(() => {
+    const current = documentRef.current
+    const blob = new Blob([JSON.stringify(current, null, 2)], {
+      type: "application/json",
+    })
+    const url = URL.createObjectURL(blob)
+    const anchor = globalThis.document.createElement("a")
+    anchor.href = url
+    anchor.download = `${current.name.trim().replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "email"}.json`
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }, [])
 
   const renameDocument = React.useCallback(
     (name: string) =>
       updateDocument((current) => touchDocument({ ...current, name })),
     [updateDocument]
   )
-
-  const saveAndExit = React.useCallback(async () => {
-    await saveDocument()
-    if (onExit) {
-      onExit()
-    } else {
-      router.push("/")
-    }
-  }, [saveDocument, onExit, router])
 
   const addBlock = React.useCallback(
     (type: EmailBlock["type"]) => {
@@ -664,25 +644,23 @@ export function EditorShell({
     [document, insertTarget, selectedBlockId, updateDocument]
   )
 
+  // The inspector uses tooltips, so the shell brings its own provider instead
+  // of relying on the host app to have one mounted.
   return (
+    <TooltipProvider>
     <EditorToolbarProvider>
       <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
         <EditorHeader
           documentName={document.name}
           onRename={renameDocument}
-          onExit={onExit ?? (() => router.push("/"))}
+          onExit={onExit}
           onSave={() => void saveDocument()}
           canUndo={canUndo}
           canRedo={canRedo}
           onUndo={undo}
           onRedo={redo}
           status={dockStatus}
-          mode={mode}
-          onSaveAndExit={() => void saveAndExit()}
-          onSaveAsTemplate={() => {
-            setTemplateName(document.name || "")
-            setSaveTemplateDialogOpen(true)
-          }}
+          onDownloadJson={downloadJson}
           onCopyJson={() => void copyTemplateJson()}
           onPasteJson={() => setPasteOpen(true)}
           view={view}
@@ -725,10 +703,6 @@ export function EditorShell({
                   setSelectedBlockId("")
                   setRightPanel("theme")
                 }}
-                onOpenSettings={() => {
-                  setSelectedBlockId("")
-                  setRightPanel("settings")
-                }}
                 assistant={renderAssistant?.({
                   document,
                   updateDocument,
@@ -767,11 +741,6 @@ export function EditorShell({
                       document={document}
                       onUpdateDocument={updateDocument}
                     />
-                  ) : rightPanel === "settings" ? (
-                    <CampaignSettingsPanel
-                      document={document}
-                      onUpdateDocument={updateDocument}
-                    />
                   ) : selectedBlock ? (
                     <BlockInspector
                       block={selectedBlock}
@@ -802,42 +771,6 @@ export function EditorShell({
 
             </div>
 
-      {/* Save as Template Dialog */}
-      <Dialog open={saveTemplateDialogOpen} onOpenChange={setSaveTemplateDialogOpen}>
-        <DialogPopup className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Save as template</DialogTitle>
-            <DialogDescription>
-              Enter a name for this template to save it to your library.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogPanel>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="template-name-input">Template name</FieldLabel>
-              <Input
-                id="template-name-input"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                placeholder="e.g. Monthly Newsletter, Product Promo"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && templateName.trim()) handleSaveAsTemplateSubmit();
-                }}
-              />
-            </Field>
-          </FieldGroup>
-          </DialogPanel>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSaveTemplateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveAsTemplateSubmit} disabled={savingTemplate || !templateName.trim()}>
-              {savingTemplate ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogPopup>
-      </Dialog>
 
       {/* Paste JSON Dialog */}
       <Dialog open={pasteOpen} onOpenChange={setPasteOpen}>
@@ -898,6 +831,7 @@ export function EditorShell({
         </div>
       </div>
     </EditorToolbarProvider>
+    </TooltipProvider>
   )
 }
 
@@ -911,9 +845,7 @@ function EditorHeader({
   onUndo,
   onRedo,
   status,
-  mode,
-  onSaveAndExit,
-  onSaveAsTemplate,
+  onDownloadJson,
   onCopyJson,
   onPasteJson,
   view,
@@ -930,9 +862,7 @@ function EditorHeader({
   onUndo?: () => void
   onRedo?: () => void
   status: DockStatus
-  mode: "campaign" | "template-creator" | "template-editor"
-  onSaveAndExit: () => void
-  onSaveAsTemplate: () => void
+  onDownloadJson: () => void
   onCopyJson: () => void
   onPasteJson: () => void
   view: EditorView
@@ -947,17 +877,19 @@ function EditorHeader({
   ] as const
   return (
     <header className="flex h-12 shrink-0 items-center justify-between bg-background px-4">
-      {/* Left: Back chevron + Title */}
+      {/* Left: Back chevron (only when the host gives us somewhere to go) + Title */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={onExit}
-          className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          type="button"
-          title="Leave the editor"
-          aria-label="Leave the editor"
-        >
-          <ChevronLeftIcon className="size-4" />
-        </button>
+        {onExit && (
+          <button
+            onClick={onExit}
+            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            type="button"
+            title="Leave the editor"
+            aria-label="Leave the editor"
+          >
+            <ChevronLeftIcon className="size-4" />
+          </button>
+        )}
         <HeaderTitle name={documentName} onRename={onRename} />
       </div>
 
@@ -1072,28 +1004,16 @@ function EditorHeader({
         {/* Vertical Divider */}
         <div className="h-4 w-px bg-border" />
 
-        {/* Action Buttons. In template-creator mode the only real persist
-            path is "save as template", so that takes the primary slot. */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-1">
-          {mode === "template-creator" ? (
-            <Button
-              onClick={onSaveAsTemplate}
-              variant="default"
-              size="sm"
-              className="h-8 px-4 font-semibold shadow-xs"
-            >
-              Save as template
-            </Button>
-          ) : (
-            <Button
-              onClick={onSave}
-              variant="default"
-              size="sm"
-              className="h-8 px-4 font-semibold shadow-xs"
-            >
-              Save
-            </Button>
-          )}
+          <Button
+            onClick={onSave}
+            variant="default"
+            size="sm"
+            className="h-8 px-4 font-semibold shadow-xs"
+          >
+            Save
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -1114,15 +1034,10 @@ function EditorHeader({
                 <HugeiconsIcon icon={LayoutTwoColumnIcon} strokeWidth={2} className="size-4 mr-2" />
                 Paste JSON
               </DropdownMenuItem>
-              {mode !== "template-creator" && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onSaveAndExit}>
-                    <HugeiconsIcon icon={DoorOpenIcon} strokeWidth={2} className="size-4 mr-2" />
-                    Save and exit
-                  </DropdownMenuItem>
-                </>
-              )}
+              <DropdownMenuItem onClick={onDownloadJson}>
+                <HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-4 mr-2" />
+                Download JSON
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -1151,7 +1066,7 @@ function HeaderTitle({
         title="Rename"
         className="rounded-md px-1.5 py-0.5 text-sm font-semibold tracking-tight text-foreground transition-colors hover:bg-muted"
       >
-        {name || "Untitled Email"}
+        {name || "Untitled email"}
       </button>
     )
   }
@@ -1239,9 +1154,6 @@ function EditorLeftSidebar({
 }: {
   onAddBlock: (type: EmailBlock["type"]) => void
   onOpenTheme: () => void
-  // onOpenSettings kept off the params while the Campaign settings button is
-  // commented out below; re-add it here (and in the caller) to restore.
-  onOpenSettings?: () => void
   /** Rendered as a second tab when the host route provides one (/studio). */
   assistant?: React.ReactNode
 }) {
@@ -1299,19 +1211,6 @@ function EditorLeftSidebar({
             />
             Edit theme
           </Button>
-          {/* Campaign settings — hidden for now (not useful in the editor sidebar).
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10"
-            title="Campaign settings"
-            aria-label="Campaign settings"
-            onClick={onOpenSettings}
-          >
-            <HugeiconsIcon icon={Settings02Icon} strokeWidth={2} />
-          </Button>
-          */}
         </div>
       </SidebarFooter>
     </Sidebar>
@@ -1415,96 +1314,6 @@ function DraggableBlockTile({
     >
       {children}
     </button>
-  )
-}
-
-function CampaignSettingsPanel({
-  document,
-  onUpdateDocument,
-}: {
-  document: EmailDocument
-  onUpdateDocument: (updater: (current: EmailDocument) => EmailDocument) => void
-}) {
-  return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="border-b px-4 py-3">
-        <p className="text-sm font-semibold">Settings</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Campaign details and sender information
-        </p>
-      </div>
-      <ScrollArea className="min-h-0 flex-1">
-        <CampaignSettings
-          document={document}
-          onUpdateDocument={onUpdateDocument}
-        />
-      </ScrollArea>
-    </div>
-  )
-}
-
-function CampaignSettings({
-  document,
-  onUpdateDocument,
-}: {
-  document: EmailDocument
-  onUpdateDocument: (updater: (current: EmailDocument) => EmailDocument) => void
-}) {
-  return (
-    <FieldGroup className="p-3">
-      <Field>
-        <FieldTitle>Campaign settings</FieldTitle>
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-doc-name">Campaign name</FieldLabel>
-        <Input
-          id="new-doc-name"
-          value={document.name}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, name: event.target.value })
-            )
-          }
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-subject">Subject line</FieldLabel>
-        <Input
-          id="new-subject"
-          value={document.subject}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, subject: event.target.value })
-            )
-          }
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-from-name">From name</FieldLabel>
-        <Input
-          id="new-from-name"
-          value={document.fromName}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, fromName: event.target.value })
-            )
-          }
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="new-from-email">From email</FieldLabel>
-        <Input
-          id="new-from-email"
-          type="email"
-          value={document.fromEmail}
-          onChange={(event) =>
-            onUpdateDocument((current) =>
-              touchDocument({ ...current, fromEmail: event.target.value })
-            )
-          }
-        />
-      </Field>
-    </FieldGroup>
   )
 }
 
