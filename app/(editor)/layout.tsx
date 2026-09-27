@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AppDialogs } from '@/components/app-dialogs';
+import { ScopeBody } from '@/components/editor/scope-body';
 
 /**
  * Route group for the full-screen editor surfaces.
@@ -15,6 +16,7 @@ import { AppDialogs } from '@/components/app-dialogs';
 export default function EditorLayout({ children }: { children: ReactNode }) {
   return (
     <div className="letterstack-ui isolate flex min-h-screen flex-col">
+      <ScopeBody />
       {children}
       <AppDialogs />
     </div>
