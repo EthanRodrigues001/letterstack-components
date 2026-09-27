@@ -1,7 +1,6 @@
 import type * as React from "react"
 
-import { getEmailContainerShadow } from "@/lib/email/shadow"
-import { resolveTheme, type EmailTheme } from "./theme"
+import { containerShadow, resolveTheme, type EmailTheme } from "./theme"
 
 // Stacks columns on phones. Harmless when there are no columns.
 const RESPONSIVE_CSS = `
@@ -73,7 +72,7 @@ export function Email({ title = "", preview, theme, children }: EmailProps) {
                     background: t.contentColor,
                     borderRadius: t.radius,
                     overflow: "hidden",
-                    boxShadow: getEmailContainerShadow({ ...t, previewText: "" }),
+                    boxShadow: containerShadow(t),
                   }}
                 >
                   <tbody>{children}</tbody>
