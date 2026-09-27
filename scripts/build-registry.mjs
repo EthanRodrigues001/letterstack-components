@@ -14,6 +14,15 @@ import { existsSync } from 'node:fs';
 
 const HOMEPAGE = 'https://github.com/EthanRodrigues001/letterstack-components';
 
+// The shadcn CLI resolves a bare registryDependency name against ui.shadcn.com,
+// so our own items have to be referenced by full URL or the install 404s.
+// Set REGISTRY_URL to the deployed site before building for production.
+const REGISTRY_URL = (
+  process.env.REGISTRY_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  'http://localhost:3000'
+).replace(/\/$/, '');
+
 /**
  * type: shadcn's item kind.
  *   registry:lib   — framework-free logic
@@ -53,6 +62,67 @@ const GROUPS = [
     registryDependencies: ['email-document'],
   },
   {
+    name: 'email-core',
+    type: 'registry:ui',
+    title: 'Email core',
+    description:
+      'The <Email> wrapper, the theme every email component reads, and renderEmail() to turn a tree into sendable HTML. Every email block installs this.',
+    files: [
+      'components/email/email.tsx',
+      'components/email/theme.ts',
+      'components/email/render.ts',
+      'components/email/block-row.tsx',
+    ],
+  },
+  {
+    name: 'email-heading',
+    type: 'registry:ui',
+    title: 'Heading',
+    description: 'A title in one of three sizes.',
+    files: ['components/email/heading.tsx'],
+    registryDependencies: ['email-core'],
+  },
+  {
+    name: 'email-text',
+    type: 'registry:ui',
+    title: 'Text',
+    description: 'A paragraph of body copy.',
+    files: ['components/email/text.tsx'],
+    registryDependencies: ['email-core'],
+  },
+  {
+    name: 'email-button',
+    type: 'registry:ui',
+    title: 'Button',
+    description: 'A call to action link, plus ButtonGroup and ButtonLink for several side by side.',
+    files: ['components/email/button.tsx'],
+    registryDependencies: ['email-core'],
+  },
+  {
+    name: 'email-image',
+    type: 'registry:ui',
+    title: 'Image',
+    description: 'A centred image, optionally linked.',
+    files: ['components/email/image.tsx'],
+    registryDependencies: ['email-core'],
+  },
+  {
+    name: 'email-divider',
+    type: 'registry:ui',
+    title: 'Divider',
+    description: 'A thin horizontal line that renders the same in Outlook.',
+    files: ['components/email/divider.tsx'],
+    registryDependencies: ['email-core'],
+  },
+  {
+    name: 'email-spacer',
+    type: 'registry:ui',
+    title: 'Spacer',
+    description: 'Empty vertical space of an exact height.',
+    files: ['components/email/spacer.tsx'],
+    registryDependencies: ['email-core'],
+  },
+  {
     name: 'editor-primitives',
     type: 'registry:ui',
     title: 'Editor primitives',
@@ -62,6 +132,7 @@ const GROUPS = [
       'components/ui/coss-dialog.tsx',
       'components/app-dialogs.tsx',
       'components/motion/range-slider.tsx',
+      'components/ui/color-picker.tsx',
     ],
   },
   {
@@ -297,6 +368,7 @@ async function analyse(group) {
   };
 }
 
+const ownItems = new Set(GROUPS.map((group) => group.name));
 const items = [];
 const problems = [];
 
@@ -321,7 +393,9 @@ for (const group of GROUPS) {
     // Pinned to the versions this repo actually builds against, so an install
     // does not silently pick up a major bump.
     dependencies: npm.map((n) => (versions[n] ? `${n}@${versions[n].replace(/^[\^~]/, '')}` : n)),
-    registryDependencies: registry,
+    registryDependencies: registry.map((dep) =>
+      ownItems.has(dep) ? `${REGISTRY_URL}/r/${dep}.json` : dep,
+    ),
     files: group.files.map((path) => ({
       path,
       type: path.startsWith('lib/')
@@ -343,7 +417,7 @@ const registry = {
 
 await writeFile('registry.json', `${JSON.stringify(registry, null, 2)}\n`, 'utf8');
 
-console.log(`registry.json written — ${items.length} items`);
+console.log(`registry.json written — ${items.length} items, linked to ${REGISTRY_URL}`);
 for (const item of items) {
   console.log(
     `  ${item.type.replace('registry:', '').padEnd(6)} ${item.name.padEnd(20)} ` +

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "email-heading",
+  "title": "Heading",
+  "description": "A title in one of three sizes.",
+  "dependencies": [],
+  "registryDependencies": [
+    "http://localhost:3000/r/email-core.json"
+  ],
+  "files": [
+    {
+      "path": "components/email/heading.tsx",
+      "content": "import type * as React from \"react\"\n\nimport { BlockRow, type BlockRowProps } from \"./block-row\"\nimport { resolveTheme, type EmailTheme } from \"./theme\"\n\nconst SIZES = { 1: 32, 2: 24, 3: 18 } as const\n\nexport type HeadingProps = BlockRowProps & {\n  level?: 1 | 2 | 3\n  align?: \"left\" | \"center\" | \"right\"\n  color?: string\n  theme?: Partial<EmailTheme>\n  children: React.ReactNode\n}\n\nexport function Heading({\n  level = 1,\n  align = \"left\",\n  color,\n  theme,\n  children,\n  ...row\n}: HeadingProps) {\n  const t = resolveTheme(theme)\n  const Tag = `h${level}` as const\n\n  return (\n    <BlockRow {...row}>\n      <tr>\n        <td\n          align={align}\n          style={{ padding: `24px ${t.padding}px 12px ${t.padding}px` }}\n        >\n          <Tag\n            style={{\n              margin: 0,\n              color: color ?? t.textColor,\n              fontFamily: t.fontFamily,\n              fontSize: SIZES[level],\n              lineHeight: 1.2,\n              fontWeight: 800,\n            }}\n          >\n            {children}\n          </Tag>\n        </td>\n      </tr>\n    </BlockRow>\n  )\n}\n",
+      "type": "registry:component",
+      "target": "components/email/heading.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

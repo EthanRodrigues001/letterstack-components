@@ -1,0 +1,72 @@
+---
+title: Text
+description: A paragraph of body copy.
+icon: Pilcrow
+---
+
+import { Text } from '@/components/email/text';
+
+<EmailPreview height={160}>
+  <Text>
+    A beautiful way to send your monthly newsletter. Build with blocks, preview in real time, send
+    with confidence.
+  </Text>
+</EmailPreview>
+
+## Installation
+
+<InstallBlock name="email-text" />
+
+## Usage
+
+```tsx
+import { Text } from '@/components/email/text';
+
+<Text>A beautiful way to send your monthly newsletter.</Text>
+```
+
+## Examples
+
+### Links and emphasis
+
+Children can hold inline elements. Style links yourself: email clients don't share one default
+link style.
+
+<EmailPreview height={150}>
+  <Text>
+    Read <strong>the full story</strong> on{' '}
+    <a href="https://example.com" style={{ color: '#E05C3A' }}>our blog</a>.
+  </Text>
+</EmailPreview>
+
+```tsx
+<Text>
+  Read <strong>the full story</strong> on{' '}
+  <a href="https://example.com" style={{ color: '#E05C3A' }}>our blog</a>.
+</Text>
+```
+
+### Muted and centred
+
+<EmailPreview height={150}>
+  <Text align="center" color="#8a8a8a">You're getting this because you signed up at example.com.</Text>
+</EmailPreview>
+
+```tsx
+<Text align="center" color="#8a8a8a">
+  You're getting this because you signed up at example.com.
+</Text>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    align: { type: "'left' | 'center' | 'right'", default: "'left'" },
+    color: { type: 'string', description: "Defaults to the theme's textColor." },
+    theme: { type: 'Partial<EmailTheme>' },
+    backgroundColor: { type: 'string', description: 'Background behind the whole row.' },
+    paddingTop: { type: 'number', default: '0' },
+    paddingBottom: { type: 'number', default: '0' },
+  }}
+/>

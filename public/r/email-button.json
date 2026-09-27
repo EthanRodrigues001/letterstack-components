@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "email-button",
+  "title": "Button",
+  "description": "A call to action link, plus ButtonGroup and ButtonLink for several side by side.",
+  "dependencies": [],
+  "registryDependencies": [
+    "http://localhost:3000/r/email-core.json"
+  ],
+  "files": [
+    {
+      "path": "components/email/button.tsx",
+      "content": "import type * as React from \"react\"\n\nimport { BlockRow, type BlockRowProps } from \"./block-row\"\nimport { resolveTheme, type EmailTheme } from \"./theme\"\n\ntype Align = \"left\" | \"center\" | \"right\"\n\nexport type ButtonLinkProps = {\n  href: string\n  variant?: \"primary\" | \"secondary\"\n  /** Fill the content width instead of hugging the label. */\n  fullWidth?: boolean\n  theme?: Partial<EmailTheme>\n  children: React.ReactNode\n}\n\n/**\n * Just the styled link, no row around it. Use it inside <ButtonGroup>, or\n * anywhere you need a button inside your own markup.\n */\nexport function ButtonLink({\n  href,\n  variant = \"primary\",\n  fullWidth = false,\n  theme,\n  children,\n}: ButtonLinkProps) {\n  const t = resolveTheme(theme)\n  const secondary = variant === \"secondary\"\n\n  return (\n    <a\n      href={href}\n      style={{\n        ...(fullWidth\n          ? {\n              display: \"block\",\n              width: \"100%\",\n              boxSizing: \"border-box\",\n              textAlign: \"center\",\n              margin: \"0 0 8px 0\",\n            }\n          : { display: \"inline-block\", margin: \"0 6px 8px 0\" }),\n        background: secondary\n          ? t.secondaryButtonBackgroundColor\n          : t.buttonBackgroundColor,\n        color: secondary ? t.secondaryButtonTextColor : t.buttonTextColor,\n        border: secondary\n          ? `1px solid ${t.secondaryButtonTextColor}`\n          : \"1px solid transparent\",\n        textDecoration: \"none\",\n        fontFamily: t.fontFamily,\n        fontSize: t.buttonFontSize,\n        fontWeight: 700,\n        lineHeight: 1,\n        padding: `${t.buttonPaddingY}px ${t.buttonPaddingX}px`,\n        borderRadius: t.buttonRadius,\n      }}\n    >\n      {children}\n    </a>\n  )\n}\n\nexport type ButtonGroupProps = BlockRowProps & {\n  align?: Align\n  theme?: Partial<EmailTheme>\n  children: React.ReactNode\n}\n\n/** Several <ButtonLink>s side by side, e.g. a primary and a secondary action. */\nexport function ButtonGroup({\n  align = \"left\",\n  theme,\n  children,\n  ...row\n}: ButtonGroupProps) {\n  const t = resolveTheme(theme)\n\n  return (\n    <BlockRow {...row}>\n      <tr>\n        <td\n          align={align}\n          style={{ padding: `4px ${t.padding}px 12px ${t.padding}px` }}\n        >\n          {children}\n        </td>\n      </tr>\n    </BlockRow>\n  )\n}\n\nexport type ButtonProps = ButtonLinkProps &\n  BlockRowProps & {\n    align?: Align\n  }\n\nexport function Button({\n  align = \"left\",\n  backgroundColor,\n  paddingTop,\n  paddingBottom,\n  ...link\n}: ButtonProps) {\n  return (\n    <ButtonGroup\n      align={link.fullWidth ? \"center\" : align}\n      theme={link.theme}\n      backgroundColor={backgroundColor}\n      paddingTop={paddingTop}\n      paddingBottom={paddingBottom}\n    >\n      <ButtonLink {...link} />\n    </ButtonGroup>\n  )\n}\n",
+      "type": "registry:component",
+      "target": "components/email/button.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

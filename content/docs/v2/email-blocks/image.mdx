@@ -1,0 +1,66 @@
+---
+title: Image
+description: A centred image, optionally linked.
+icon: Image
+---
+
+import { Image } from '@/components/email/image';
+
+<EmailPreview height={330}>
+  <Image src="https://placehold.co/1200x500/e8e8e8/888888/png?text=Hero+image" alt="Hero image" />
+</EmailPreview>
+
+## Installation
+
+<InstallBlock name="email-image" />
+
+## Usage
+
+```tsx
+import { Image } from '@/components/email/image';
+
+<Image src="https://example.com/hero.png" alt="Spring collection" />
+```
+
+Use an absolute URL on a server you control. Email clients won't load relative paths, and most
+of them block `data:` URLs.
+
+## Examples
+
+### Narrower, with a link
+
+<EmailPreview height={260}>
+  <Image
+    src="https://placehold.co/1200x500/e8e8e8/888888/png?text=60%25+wide"
+    alt="Product shot"
+    width={60}
+    href="https://example.com"
+  />
+</EmailPreview>
+
+```tsx
+<Image src="/product.png" alt="Product shot" width={60} href="https://example.com/shop" />
+```
+
+## Props
+
+<TypeTable
+  type={{
+    src: { type: 'string', required: true },
+    alt: {
+      type: 'string',
+      required: true,
+      description: 'Shown when images are blocked, which is the default in many clients.',
+    },
+    width: {
+      type: 'number',
+      description: 'Percentage of the content width, 1–100.',
+      default: '100',
+    },
+    href: { type: 'string', description: 'Makes the image a link.' },
+    theme: { type: 'Partial<EmailTheme>' },
+    backgroundColor: { type: 'string' },
+    paddingTop: { type: 'number', default: '0' },
+    paddingBottom: { type: 'number', default: '0' },
+  }}
+/>

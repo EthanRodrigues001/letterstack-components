@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "email-spacer",
+  "title": "Spacer",
+  "description": "Empty vertical space of an exact height.",
+  "dependencies": [],
+  "registryDependencies": [
+    "http://localhost:3000/r/email-core.json"
+  ],
+  "files": [
+    {
+      "path": "components/email/spacer.tsx",
+      "content": "import { BlockRow, type BlockRowProps } from \"./block-row\"\n\nexport type SpacerProps = BlockRowProps & {\n  /** In pixels. */\n  height?: number\n}\n\nexport function Spacer({ height = 24, ...row }: SpacerProps) {\n  return (\n    <BlockRow {...row}>\n      <tr>\n        <td style={{ height, lineHeight: `${height}px`, fontSize: 1 }}>\n          &nbsp;\n        </td>\n      </tr>\n    </BlockRow>\n  )\n}\n",
+      "type": "registry:component",
+      "target": "components/email/spacer.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

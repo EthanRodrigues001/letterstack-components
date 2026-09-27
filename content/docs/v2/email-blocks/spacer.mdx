@@ -1,0 +1,40 @@
+---
+title: Spacer
+description: Empty vertical space of an exact height.
+icon: MoveVertical
+---
+
+import { Spacer } from '@/components/email/spacer';
+import { Text } from '@/components/email/text';
+
+<EmailPreview height={220}>
+  <Text>Before the gap.</Text>
+  <Spacer height={64} backgroundColor="#fef3ee" />
+  <Text>After a 64px gap, tinted so you can see it.</Text>
+</EmailPreview>
+
+## Installation
+
+<InstallBlock name="email-spacer" />
+
+## Usage
+
+```tsx
+import { Spacer } from '@/components/email/spacer';
+
+<Spacer height={32} />
+```
+
+Margins on block elements are unreliable across email clients. A table cell with a fixed
+height is the one gap every client respects.
+
+## Props
+
+<TypeTable
+  type={{
+    height: { type: 'number', description: 'In pixels.', default: '24' },
+    backgroundColor: { type: 'string' },
+    paddingTop: { type: 'number', default: '0' },
+    paddingBottom: { type: 'number', default: '0' },
+  }}
+/>

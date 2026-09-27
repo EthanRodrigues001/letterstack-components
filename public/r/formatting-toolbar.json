@@ -10,7 +10,7 @@
   ],
   "registryDependencies": [
     "button",
-    "editor-primitives",
+    "http://localhost:3000/r/editor-primitives.json",
     "field",
     "input",
     "select",

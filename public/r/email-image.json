@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "email-image",
+  "title": "Image",
+  "description": "A centred image, optionally linked.",
+  "dependencies": [],
+  "registryDependencies": [
+    "http://localhost:3000/r/email-core.json"
+  ],
+  "files": [
+    {
+      "path": "components/email/image.tsx",
+      "content": "import { BlockRow, type BlockRowProps } from \"./block-row\"\nimport { resolveTheme, type EmailTheme } from \"./theme\"\n\nexport type ImageProps = BlockRowProps & {\n  src: string\n  alt: string\n  /** Percentage of the content width, 1–100. */\n  width?: number\n  /** Makes the image a link. */\n  href?: string\n  theme?: Partial<EmailTheme>\n}\n\nexport function Image({\n  src,\n  alt,\n  width = 100,\n  href,\n  theme,\n  ...row\n}: ImageProps) {\n  const t = resolveTheme(theme)\n\n  // Outlook ignores CSS widths on images, so the width attribute carries the\n  // real pixel size and the style handles everything else.\n  const img = (\n    // eslint-disable-next-line @next/next/no-img-element -- this is email HTML, not a page\n    <img\n      src={src}\n      alt={alt}\n      width={Math.round((t.maxWidth * width) / 100)}\n      style={{\n        display: \"block\",\n        margin: \"0 auto\",\n        width: `${width}%`,\n        maxWidth: t.maxWidth,\n        height: \"auto\",\n        border: 0,\n      }}\n    />\n  )\n\n  return (\n    <BlockRow {...row}>\n      <tr>\n        <td align=\"center\" style={{ padding: 0 }}>\n          {href ? (\n            <a href={href} style={{ display: \"block\", textDecoration: \"none\" }}>\n              {img}\n            </a>\n          ) : (\n            img\n          )}\n        </td>\n      </tr>\n    </BlockRow>\n  )\n}\n",
+      "type": "registry:component",
+      "target": "components/email/image.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

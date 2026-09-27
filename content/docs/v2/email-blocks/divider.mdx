@@ -1,0 +1,44 @@
+---
+title: Divider
+description: A thin horizontal line between sections.
+icon: Minus
+---
+
+import { Divider } from '@/components/email/divider';
+import { Text } from '@/components/email/text';
+
+<EmailPreview height={200}>
+  <Text>Above the line.</Text>
+  <Divider />
+  <Text>Below the line.</Text>
+</EmailPreview>
+
+## Installation
+
+<InstallBlock name="email-divider" />
+
+## Usage
+
+```tsx
+import { Divider } from '@/components/email/divider';
+
+<Divider />
+```
+
+It's a 1px `<div>`, not an `<hr>`. Outlook draws `<hr>` with its own borders and margins, and
+you can't fully override them.
+
+## Props
+
+<TypeTable
+  type={{
+    color: {
+      type: 'string',
+      description: "Line colour, drawn at 24% opacity. Defaults to the theme's textColor.",
+    },
+    theme: { type: 'Partial<EmailTheme>' },
+    backgroundColor: { type: 'string' },
+    paddingTop: { type: 'number', default: '0' },
+    paddingBottom: { type: 'number', default: '0' },
+  }}
+/>
